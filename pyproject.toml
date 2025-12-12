@@ -9,10 +9,14 @@ authors = [
 requires-python = ">=3.11"
 dependencies = [
     "jaxpm>=0.1.6",
+    "matplotlib>=3.10.8",
     "packaging>=25.0",
     "setuptools>=80.9.0",
     "typer>=0.20.0",
 ]
+
+[project.scripts]
+davis1985 = "differentiabledavis1985.cli:main"
 
 [build-system]
 requires = ["uv_build>=0.8.6,<0.9.0"]
