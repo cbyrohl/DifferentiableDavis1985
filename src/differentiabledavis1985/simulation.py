@@ -21,6 +21,8 @@ def run_nbody_simulation(
     omega_m=0.3,
     seed=42,
     n_steps_min=2,
+    rtol=1e-5,
+    atol=1e-5,
 ):
     """Run an N-body simulation using jaxpm.
 
@@ -42,6 +44,10 @@ def run_nbody_simulation(
         Random seed for initial conditions
     n_steps_min : int
         Minimum number of output snapshots for ODE integrator (default: 2)
+    rtol : float
+        Relative tolerance for ODE integrator (default: 1e-5)
+    atol : float
+        Absolute tolerance for ODE integrator (default: 1e-5)
 
     Returns
     -------
@@ -61,6 +67,7 @@ def run_nbody_simulation(
     logger.info(f"  Redshift: {z_init} -> {z_final}")
     logger.info(f"  Omega_m: {omega_m}")
     logger.info(f"  n_steps_min: {n_steps_min}")
+    logger.info(f"  rtol: {rtol}, atol: {atol}")
 
     # Convert redshift to scale factor
     a_init = 1.0 / (1.0 + z_init)
@@ -138,8 +145,8 @@ def run_nbody_simulation(
         [positions_init, p],
         snapshots,
         cosmo,
-        rtol=1e-5,
-        atol=1e-5
+        rtol=rtol,
+        atol=atol
     )
 
     # Extract all positions (result[0] is positions at each snapshot)

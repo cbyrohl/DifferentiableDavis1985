@@ -3,13 +3,19 @@ Differentiable projection functions for mapping 3D density/particles to 2D masks
 
 This module provides JAX-differentiable operations for:
 - Projecting 3D density fields to 2D
-- Converting particle positions to 2D soft occupancy masks
+- Converting 2D projections to soft occupancy masks
 - Comparing simulated projections to observed 2D masks
+
+The main workflow is:
+1. Run simulation to get 3D particle positions
+2. Paint positions to 3D density using CIC (done by forward_model)
+3. Project 3D density to 2D by summing along one axis
+4. Convert to soft mask using soft_occupancy or soft_threshold
+5. Compare to target mask using loss functions
 """
 
 import jax
 import jax.numpy as jnp
-from jaxpm.painting import cic_paint
 from typing import Tuple, Optional
 
 
@@ -119,114 +125,6 @@ def density_to_soft_mask(
         return soft_occupancy(projection, scale=scale)
     else:
         raise ValueError(f"Unknown method: {method}. Use 'sigmoid' or 'occupancy'.")
-
-
-def positions_to_2d_density(
-    positions: jnp.ndarray,
-    mesh_shape_2d: Tuple[int, int],
-    mesh_shape_3d: Tuple[int, int, int],
-    axis: int = 2
-) -> jnp.ndarray:
-    """
-    Paint particle positions directly to a 2D density field.
-
-    Projects 3D positions to 2D and uses CIC painting to create
-    a smooth density field.
-
-    Args:
-        positions: Particle positions of shape (N, 3) in mesh units
-        mesh_shape_2d: Output 2D mesh shape (nx, ny)
-        mesh_shape_3d: Original 3D mesh shape (for coordinate scaling)
-        axis: Axis to project along (0=x, 1=y, 2=z)
-
-    Returns:
-        2D density field of shape mesh_shape_2d
-    """
-    # Extract 2D coordinates by dropping the projection axis
-    if axis == 0:
-        pos_2d = positions[:, [1, 2]]  # (y, z)
-    elif axis == 1:
-        pos_2d = positions[:, [0, 2]]  # (x, z)
-    else:  # axis == 2
-        pos_2d = positions[:, [0, 1]]  # (x, y)
-
-    # Scale coordinates if mesh shapes differ
-    scale_factors = jnp.array([
-        mesh_shape_2d[0] / mesh_shape_3d[0 if axis != 0 else 1],
-        mesh_shape_2d[1] / mesh_shape_3d[2 if axis != 2 else 1]
-    ])
-
-    if axis == 0:
-        scale_factors = jnp.array([
-            mesh_shape_2d[0] / mesh_shape_3d[1],
-            mesh_shape_2d[1] / mesh_shape_3d[2]
-        ])
-    elif axis == 1:
-        scale_factors = jnp.array([
-            mesh_shape_2d[0] / mesh_shape_3d[0],
-            mesh_shape_2d[1] / mesh_shape_3d[2]
-        ])
-    else:
-        scale_factors = jnp.array([
-            mesh_shape_2d[0] / mesh_shape_3d[0],
-            mesh_shape_2d[1] / mesh_shape_3d[1]
-        ])
-
-    pos_2d_scaled = pos_2d * scale_factors
-
-    # Paint to 2D grid using CIC
-    # Note: cic_paint expects 3D, so we use a workaround with a thin 3D grid
-    mesh_3d_thin = (mesh_shape_2d[0], mesh_shape_2d[1], 1)
-    pos_3d_thin = jnp.concatenate([pos_2d_scaled, jnp.zeros((positions.shape[0], 1))], axis=1)
-
-    density_3d = cic_paint(jnp.zeros(mesh_3d_thin), pos_3d_thin)
-    return density_3d[:, :, 0]
-
-
-def positions_to_soft_mask(
-    positions: jnp.ndarray,
-    mask_shape: Tuple[int, int],
-    mesh_shape_3d: Tuple[int, int, int],
-    axis: int = 2,
-    method: str = "occupancy",
-    scale: float = 1.0,
-    threshold: Optional[float] = None,
-    sharpness: float = 10.0
-) -> jnp.ndarray:
-    """
-    Convert 3D particle positions to a 2D soft mask.
-
-    This is the primary function for comparing simulations to observed masks.
-    It projects particle positions to 2D and creates a differentiable
-    approximation of particle occupancy.
-
-    Args:
-        positions: Particle positions of shape (N, 3) in mesh units
-        mask_shape: Output mask shape (nx, ny)
-        mesh_shape_3d: Original 3D mesh shape for coordinate scaling
-        axis: Axis to project along (0=x, 1=y, 2=z)
-        method: "occupancy" (exponential) or "sigmoid" (threshold-based)
-        scale: Scale for occupancy method
-        threshold: Threshold for sigmoid method
-        sharpness: Sharpness for sigmoid method
-
-    Returns:
-        2D soft mask in [0, 1] range of shape mask_shape
-    """
-    # Paint positions to 2D density
-    density_2d = positions_to_2d_density(
-        positions, mask_shape, mesh_shape_3d, axis=axis
-    )
-
-    # Convert to soft mask
-    if method == "occupancy":
-        return soft_occupancy(density_2d, scale=scale)
-    elif method == "sigmoid":
-        if threshold is None:
-            threshold = jnp.mean(density_2d)
-        return soft_threshold(density_2d, threshold=threshold, sharpness=sharpness)
-    else:
-        raise ValueError(f"Unknown method: {method}")
 
 
 def mask_loss_bce(

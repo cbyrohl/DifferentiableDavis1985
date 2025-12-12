@@ -413,3 +413,338 @@ def plot_density_comparison(
     plt.tight_layout()
 
     return fig, axes
+
+
+def plot_reconstruction_comparison_2x2(
+    target_density_init,
+    target_density_final,
+    reconstructed_density_init,
+    reconstructed_density_final,
+    boxsize,
+    a_init,
+    a_final,
+    slc_idx=None,
+    losidx=2,
+    figsize=(12, 12),
+):
+    """Plot 2x2 comparison of target vs reconstructed density evolution.
+
+    Top row: Target (initial left, final right)
+    Bottom row: Reconstructed (initial left, final right)
+
+    Parameters
+    ----------
+    target_density_init : array_like
+        Target initial 3D density field
+    target_density_final : array_like
+        Target final 3D density field
+    reconstructed_density_init : array_like
+        Reconstructed initial 3D density field
+    reconstructed_density_final : array_like
+        Reconstructed final 3D density field
+    boxsize : float
+        Box size in Mpc/h
+    a_init : float
+        Initial scale factor
+    a_final : float
+        Final scale factor
+    slc_idx : int, optional
+        Index of slice to plot. If None, plots middle slice.
+    losidx : int
+        Line-of-sight axis (0, 1, or 2) for slicing
+    figsize : tuple
+        Figure size (width, height)
+
+    Returns
+    -------
+    fig : matplotlib.figure.Figure
+        Figure object
+    axes : array of matplotlib.axes.Axes
+        2x2 array of axes
+    """
+    if isinstance(boxsize, (int, float)):
+        boxsize = [boxsize] * 3
+
+    # Convert to overdensity
+    target_delta_init = density_to_overdensity(target_density_init)
+    target_delta_final = density_to_overdensity(target_density_final)
+    recon_delta_init = density_to_overdensity(reconstructed_density_init)
+    recon_delta_final = density_to_overdensity(reconstructed_density_final)
+
+    if slc_idx is None:
+        slc_idx = target_density_init.shape[losidx] // 2
+
+    # Extract slices
+    if losidx == 0:
+        target_slc_init = target_delta_init[slc_idx, :, :]
+        target_slc_final = target_delta_final[slc_idx, :, :]
+        recon_slc_init = recon_delta_init[slc_idx, :, :]
+        recon_slc_final = recon_delta_final[slc_idx, :, :]
+        extent = [0, boxsize[1], 0, boxsize[2]]
+    elif losidx == 1:
+        target_slc_init = target_delta_init[:, slc_idx, :]
+        target_slc_final = target_delta_final[:, slc_idx, :]
+        recon_slc_init = recon_delta_init[:, slc_idx, :]
+        recon_slc_final = recon_delta_final[:, slc_idx, :]
+        extent = [0, boxsize[0], 0, boxsize[2]]
+    elif losidx == 2:
+        target_slc_init = target_delta_init[:, :, slc_idx]
+        target_slc_final = target_delta_final[:, :, slc_idx]
+        recon_slc_init = recon_delta_init[:, :, slc_idx]
+        recon_slc_final = recon_delta_final[:, :, slc_idx]
+        extent = [0, boxsize[0], 0, boxsize[1]]
+    else:
+        raise ValueError("losidx must be 0, 1 or 2")
+
+    # Compute color scales
+    # Initial: 30x smaller range than final
+    vmax_final = np.percentile(np.abs(target_slc_final), 99)
+    vmax_init = vmax_final / 30.0
+    vmin_final = -vmax_final
+    vmin_init = -vmax_init
+
+    # Create 2x2 subplot
+    fig, axes = plt.subplots(2, 2, figsize=figsize)
+
+    ikw_init = dict(
+        cmap="RdBu_r",
+        interpolation="nearest",
+        vmin=vmin_init,
+        vmax=vmax_init,
+        extent=extent,
+        origin="lower",
+    )
+
+    ikw_final = dict(
+        cmap="RdBu_r",
+        interpolation="nearest",
+        vmin=vmin_final,
+        vmax=vmax_final,
+        extent=extent,
+        origin="lower",
+    )
+
+    # Top-left: Target initial
+    im_target_init = axes[0, 0].imshow(target_slc_init.T, **ikw_init)
+    axes[0, 0].set_title(f"Target Initial (a = {a_init:.2f})", fontsize=12)
+    axes[0, 0].set_xlabel("cMpc/h")
+    axes[0, 0].set_ylabel("cMpc/h")
+
+    # Top-right: Target final
+    im_target_final = axes[0, 1].imshow(target_slc_final.T, **ikw_final)
+    axes[0, 1].set_title(f"Target Final (a = {a_final:.2f})", fontsize=12)
+    axes[0, 1].set_xlabel("cMpc/h")
+    axes[0, 1].set_ylabel("cMpc/h")
+
+    # Bottom-left: Reconstructed initial
+    im_recon_init = axes[1, 0].imshow(recon_slc_init.T, **ikw_init)
+    axes[1, 0].set_title(f"Reconstructed Initial (a = {a_init:.2f})", fontsize=12)
+    axes[1, 0].set_xlabel("cMpc/h")
+    axes[1, 0].set_ylabel("cMpc/h")
+
+    # Bottom-right: Reconstructed final
+    im_recon_final = axes[1, 1].imshow(recon_slc_final.T, **ikw_final)
+    axes[1, 1].set_title(f"Reconstructed Final (a = {a_final:.2f})", fontsize=12)
+    axes[1, 1].set_xlabel("cMpc/h")
+    axes[1, 1].set_ylabel("cMpc/h")
+
+    # Add colorbars
+    # Adjust figure to make room for colorbars on both sides
+    fig.subplots_adjust(left=0.12, right=0.88)
+
+    # Colorbar for initial densities (LEFT side for left column)
+    cbar_ax_init = fig.add_axes([0.02, 0.53, 0.02, 0.35])
+    cbar_init = fig.colorbar(im_target_init, cax=cbar_ax_init)
+    cbar_init.set_label(r"Initial $\delta$ (30× zoom)", fontsize=10)
+
+    # Colorbar for final densities (RIGHT side for right column)
+    cbar_ax_final = fig.add_axes([0.92, 0.53, 0.02, 0.35])
+    cbar_final = fig.colorbar(im_target_final, cax=cbar_ax_final)
+    cbar_final.set_label(r"Final $\delta$", fontsize=10)
+
+    plt.tight_layout(rect=[0.12, 0, 0.88, 1])
+
+    return fig, axes
+
+
+def generate_reconstruction_gif(
+    iterations_ics,
+    target_density_init,
+    target_density_final,
+    model,
+    boxsize,
+    a_init,
+    a_final,
+    output_path,
+    rtol=1e-2,
+    atol=1e-2,
+    fps=2,
+    slice_depth=None
+):
+    """
+    Generate GIF animation of reconstruction optimization iterations.
+
+    Creates a 2x2 layout where:
+    - Top row (target): remains static
+    - Bottom row (reconstructed): updates each iteration
+
+    Parameters
+    ----------
+    iterations_ics : list of (int, array)
+        List of (iteration_number, initial_conditions) tuples from optimization
+    target_density_init : array_like
+        Target initial density field (static)
+    target_density_final : array_like
+        Target final density field (static)
+    model : Davis1985Simulation
+        Simulation model to run forward simulations
+    boxsize : float
+        Box size in cMpc/h
+    a_init : float
+        Initial scale factor
+    a_final : float
+        Final scale factor
+    output_path : str
+        Path to save the GIF file
+    rtol : float
+        Relative tolerance for ODE integrator
+    atol : float
+        Absolute tolerance for ODE integrator
+    fps : int
+        Frames per second for GIF
+    slice_depth : int, optional
+        Depth for slice (default: middle of box)
+
+    Returns
+    -------
+    str
+        Path to generated GIF file
+    """
+    import tempfile
+    import os
+    from pathlib import Path
+
+    try:
+        from PIL import Image
+    except ImportError:
+        raise ImportError("PIL/Pillow required for GIF generation. Install with: uv add pillow")
+
+    print(f"\nGenerating GIF with {len(iterations_ics)} frames...")
+    print(f"Output: {output_path}")
+
+    # Create temp directory for frames
+    temp_dir = tempfile.mkdtemp()
+    frame_paths = []
+
+    # Determine slice depth
+    if slice_depth is None:
+        slice_depth = target_density_init.shape[2] // 2
+
+    # Convert target to overdensity (static)
+    target_delta_init = density_to_overdensity(target_density_init)
+    target_delta_final = density_to_overdensity(target_density_final)
+
+    # Get slices for static target
+    target_slc_init = target_delta_init[:, :, slice_depth]
+    target_slc_final = target_delta_final[:, :, slice_depth]
+
+    # Compute color scales
+    vmax_final = np.percentile(np.abs(target_slc_final), 99)
+    vmax_init = vmax_final / 30.0
+
+    extent = [0, boxsize, 0, boxsize]
+
+    try:
+        for idx, (iteration, ics) in enumerate(iterations_ics):
+            print(f"  Frame {idx+1}/{len(iterations_ics)}: iteration {iteration}", flush=True)
+
+            # Run forward simulation with current ICs
+            positions, _ = model.run_simulation(ics, rtol=rtol, atol=atol)
+
+            # Paint densities
+            recon_density_init = model.paint_density(positions[0])
+            recon_density_final = model.paint_density(positions[-1])
+
+            # Convert to overdensity
+            recon_delta_init = density_to_overdensity(recon_density_init)
+            recon_delta_final = density_to_overdensity(recon_density_final)
+
+            # Get slices
+            recon_slc_init = recon_delta_init[:, :, slice_depth]
+            recon_slc_final = recon_delta_final[:, :, slice_depth]
+
+            # Create 2x2 plot
+            fig, axes = plt.subplots(2, 2, figsize=(12, 12))
+
+            # Imshow kwargs
+            ikw_init = {'extent': extent, 'origin': 'lower', 'cmap': 'RdBu_r',
+                       'vmin': -vmax_init, 'vmax': vmax_init, 'aspect': 'auto'}
+            ikw_final = {'extent': extent, 'origin': 'lower', 'cmap': 'RdBu_r',
+                        'vmin': -vmax_final, 'vmax': vmax_final, 'aspect': 'auto'}
+
+            # Top-left: Target initial (static)
+            im_target_init = axes[0, 0].imshow(target_slc_init.T, **ikw_init)
+            axes[0, 0].set_title(f"Target Initial (a = {a_init:.2f})", fontsize=12)
+            axes[0, 0].set_xlabel("cMpc/h")
+            axes[0, 0].set_ylabel("cMpc/h")
+
+            # Top-right: Target final (static)
+            im_target_final = axes[0, 1].imshow(target_slc_final.T, **ikw_final)
+            axes[0, 1].set_title(f"Target Final (a = {a_final:.2f})", fontsize=12)
+            axes[0, 1].set_xlabel("cMpc/h")
+            axes[0, 1].set_ylabel("cMpc/h")
+
+            # Bottom-left: Reconstructed initial (updating)
+            im_recon_init = axes[1, 0].imshow(recon_slc_init.T, **ikw_init)
+            axes[1, 0].set_title(f"Reconstructed Initial (iter {iteration})", fontsize=12)
+            axes[1, 0].set_xlabel("cMpc/h")
+            axes[1, 0].set_ylabel("cMpc/h")
+
+            # Bottom-right: Reconstructed final (updating)
+            im_recon_final = axes[1, 1].imshow(recon_slc_final.T, **ikw_final)
+            axes[1, 1].set_title(f"Reconstructed Final (iter {iteration})", fontsize=12)
+            axes[1, 1].set_xlabel("cMpc/h")
+            axes[1, 1].set_ylabel("cMpc/h")
+
+            # Add colorbars
+            fig.subplots_adjust(left=0.12, right=0.88)
+
+            # LEFT colorbar for initial densities
+            cbar_ax_init = fig.add_axes([0.02, 0.53, 0.02, 0.35])
+            cbar_init = fig.colorbar(im_target_init, cax=cbar_ax_init)
+            cbar_init.set_label(r"Initial $\delta$ (30× zoom)", fontsize=10)
+
+            # RIGHT colorbar for final densities
+            cbar_ax_final = fig.add_axes([0.92, 0.53, 0.02, 0.35])
+            cbar_final = fig.colorbar(im_target_final, cax=cbar_ax_final)
+            cbar_final.set_label(r"Final $\delta$", fontsize=10)
+
+            plt.tight_layout(rect=[0.12, 0, 0.88, 1])
+
+            # Save frame
+            frame_path = os.path.join(temp_dir, f"frame_{idx:04d}.png")
+            fig.savefig(frame_path, dpi=100, bbox_inches='tight')
+            frame_paths.append(frame_path)
+            plt.close(fig)
+
+        # Create GIF from frames
+        print(f"\nCompiling {len(frame_paths)} frames into GIF...")
+        frames = [Image.open(fp) for fp in frame_paths]
+        frames[0].save(
+            output_path,
+            save_all=True,
+            append_images=frames[1:],
+            duration=int(1000/fps),
+            loop=0
+        )
+
+        print(f"GIF saved to: {output_path}")
+
+    finally:
+        # Clean up temp files
+        for fp in frame_paths:
+            if os.path.exists(fp):
+                os.remove(fp)
+        os.rmdir(temp_dir)
+
+    return output_path

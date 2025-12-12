@@ -71,21 +71,24 @@ def extract_particle_mask(
     remove_frame: bool = True,
     square: bool = True,
     resolution: int | None = None,
-) -> tuple[np.ndarray, np.ndarray] | None:
+) -> tuple[np.ndarray, np.ndarray, np.ndarray] | None:
     """
     Extract a binary particle mask from a scatter plot image.
 
     Parameters:
         image_path: Path to the image file
         darkness_threshold: Minimum darkness percentage (0-100) for a pixel to be considered
-            a particle. Default 10% means pixels at least 10% dark are particles.
+            a particle. Default 2% means pixels at least 2% dark are particles.
             Lower values = stricter (fewer particles), higher = more lenient.
         remove_frame: If True, automatically detect and remove the rectangular frame
         square: If True, crop to square (center crop using the smaller dimension)
         resolution: If set, resize the mask to this resolution (e.g., 64 for 64x64)
 
     Returns:
-        Tuple of (mask, cropped_image) where mask has 1 for particles, 0 for background.
+        Tuple of (mask, cropped_image, intermediate_mask) where:
+        - mask: final binary mask (possibly resized)
+        - cropped_image: grayscale image after processing
+        - intermediate_mask: full-resolution square mask before any resizing
         Returns None if the file cannot be loaded.
     """
     try:
@@ -121,6 +124,9 @@ def extract_particle_mask(
     # Apply threshold BEFORE resizing to preserve particle information
     mask = (img_array < pixel_threshold).astype(np.uint8)
 
+    # Store the intermediate (full-resolution square) mask
+    intermediate_mask = mask.copy()
+
     if resolution is not None:
         # Resize the binary mask using NEAREST to preserve particle counts
         # Also resize the grayscale image for visualization
@@ -133,4 +139,4 @@ def extract_particle_mask(
         img_array = np.array(img_pil)
         logger.info(f"Resized to: {resolution}x{resolution}")
 
-    return mask, img_array
+    return mask, img_array, intermediate_mask

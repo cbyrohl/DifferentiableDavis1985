@@ -8,7 +8,7 @@ from typing import Optional
 from loguru import logger
 
 from .simulation import run_nbody_simulation
-from .plotting import plot_density_slice_from_cube, plot_density_comparison, plot_overdensity_comparison
+from .plotting import plot_density_slice_from_cube, plot_density_comparison, plot_overdensity_comparison, plot_reconstruction_comparison_2x2, generate_reconstruction_gif
 from .config import SimulationConfig
 from .forward_model import Davis1985Simulation
 from .optimization import generate_target_and_reconstruct
@@ -64,6 +64,8 @@ def plot(
     output_dir: Annotated[str, typer.Option("--output", "-o", help="Output directory")] = "output",
     seed: Annotated[Optional[int], typer.Option("--seed", help="Random seed (overrides config)")] = None,
     n_steps_min: Annotated[Optional[int], typer.Option("--n-steps-min", help="Min output snapshots for ODE integrator (overrides config)")] = None,
+    rtol: Annotated[Optional[float], typer.Option("--rtol", help="ODE relative tolerance (overrides config)")] = None,
+    atol: Annotated[Optional[float], typer.Option("--atol", help="ODE absolute tolerance (overrides config)")] = None,
     verbose: Annotated[bool, typer.Option("--verbose", "-v", help="Enable verbose (DEBUG) logging")] = True,
 ):
     """Run simulation and plot density field slices."""
@@ -100,6 +102,12 @@ def plot(
     if n_steps_min is not None:
         logger.debug(f"Overriding n_steps_min: {sim_config.n_steps_min} -> {n_steps_min}")
         sim_config.n_steps_min = n_steps_min
+    if rtol is not None:
+        logger.debug(f"Overriding rtol: {sim_config.rtol} -> {rtol}")
+        sim_config.rtol = rtol
+    if atol is not None:
+        logger.debug(f"Overriding atol: {sim_config.atol} -> {atol}")
+        sim_config.atol = atol
 
     # Handle redshift/scale factor conversion
     if z_init is not None:
@@ -135,6 +143,8 @@ def plot(
         omega_m=sim_config.omega_m,
         seed=sim_config.seed,
         n_steps_min=sim_config.n_steps_min,
+        rtol=sim_config.rtol,
+        atol=sim_config.atol,
     )
 
     # Determine filename suffix
@@ -175,6 +185,9 @@ def reconstruct(
     atol: Annotated[float, typer.Option("--atol", help="ODE absolute tolerance (lower=faster, default 1e-4)")] = 1e-4,
     n_steps_min: Annotated[Optional[int], typer.Option("--n-steps-min", help="Min output snapshots for ODE integrator (overrides config)")] = None,
     output_dir: Annotated[str, typer.Option("--output", "-o", help="Output directory")] = "output/reconstruction",
+    generate_gif: Annotated[bool, typer.Option("--gif/--no-gif", help="Generate GIF animation of optimization iterations")] = True,
+    gif_save_every: Annotated[int, typer.Option("--gif-save-every", help="Save every N iterations for GIF (lower=more frames)")] = 5,
+    gif_fps: Annotated[int, typer.Option("--gif-fps", help="Frames per second for GIF")] = 2,
     verbose: Annotated[bool, typer.Option("--verbose", "-v", help="Enable verbose (DEBUG) logging")] = True,
 ):
     """Reconstruct initial conditions from target final density field.
@@ -255,7 +268,9 @@ def reconstruct(
         learning_rate=learning_rate,
         loss_type=loss_type,
         rtol=rtol,
-        atol=atol
+        atol=atol,
+        save_iterations=generate_gif,
+        save_every=gif_save_every
     )
 
     # Create output directory
@@ -266,9 +281,11 @@ def reconstruct(
     # Save results
     logger.info("Saving results...")
     np.save(output_path / "target_ics.npy", np.array(results['target_ics']))
-    np.save(output_path / "target_density.npy", np.array(results['target_density']))
+    np.save(output_path / "target_density_init.npy", np.array(results['target_density_init']))
+    np.save(output_path / "target_density_final.npy", np.array(results['target_density_final']))
     np.save(output_path / "reconstructed_ics.npy", np.array(results['reconstructed_ics']))
-    np.save(output_path / "reconstructed_density.npy", np.array(results['reconstructed_density']))
+    np.save(output_path / "reconstructed_density_init.npy", np.array(results['reconstructed_density_init']))
+    np.save(output_path / "reconstructed_density_final.npy", np.array(results['reconstructed_density_final']))
     np.save(output_path / "losses.npy", np.array(results['losses']))
     logger.debug(f"Saved arrays to {output_path}/")
 
@@ -278,42 +295,49 @@ def reconstruct(
     ax.plot(results['losses'], marker='o')
     ax.set_xlabel("Iteration (x10)")
     ax.set_ylabel("Loss")
+    ax.set_yscale('log')
     ax.set_title("Reconstruction Loss Convergence")
-    ax.grid(True, alpha=0.3)
+    ax.grid(True, alpha=0.3, which='both')
     loss_path = output_path / "loss_convergence.png"
     fig.savefig(loss_path, dpi=150, bbox_inches='tight')
     logger.debug(f"Saved to: {loss_path}")
     plt.close(fig)
 
-    # Plot overdensity comparison: Target
-    logger.info("Plotting target overdensity evolution...")
-    fig, _ = plot_overdensity_comparison(
-        results['target_ics'],
-        results['target_density'],
+    # Plot 2x2 comparison: Target vs Reconstructed, Initial vs Final
+    logger.info("Plotting 2x2 reconstruction comparison...")
+    fig, _ = plot_reconstruction_comparison_2x2(
+        results['target_density_init'],
+        results['target_density_final'],
+        results['reconstructed_density_init'],
+        results['reconstructed_density_final'],
         sim_config.box_size,
         a_init=a_init,
         a_final=a_final,
     )
-    fig.suptitle("Target Overdensity Evolution", fontsize=14, y=0.98)
-    target_path = output_path / "overdensity_target.png"
-    fig.savefig(target_path, dpi=150, bbox_inches='tight')
-    logger.debug(f"Saved to: {target_path}")
+    fig.suptitle("Density Field Reconstruction", fontsize=16, y=0.995)
+    comparison_path = output_path / "reconstruction_comparison_2x2.png"
+    fig.savefig(comparison_path, dpi=150, bbox_inches='tight')
+    logger.info(f"Saved comparison plot to: {comparison_path}")
     plt.close(fig)
 
-    # Plot overdensity comparison: Reconstructed
-    logger.info("Plotting reconstructed overdensity evolution...")
-    fig, _ = plot_overdensity_comparison(
-        results['reconstructed_ics'],
-        results['reconstructed_density'],
-        sim_config.box_size,
-        a_init=a_init,
-        a_final=a_final,
-    )
-    fig.suptitle("Reconstructed Overdensity Evolution", fontsize=14, y=0.98)
-    recon_path = output_path / "overdensity_reconstructed.png"
-    fig.savefig(recon_path, dpi=150, bbox_inches='tight')
-    logger.debug(f"Saved to: {recon_path}")
-    plt.close(fig)
+    # Generate GIF animation if iterations were saved
+    if generate_gif and results['iterations_ics']:
+        logger.info(f"Generating GIF animation from {len(results['iterations_ics'])} saved iterations...")
+        gif_path = output_path / "reconstruction_animation.gif"
+        generate_reconstruction_gif(
+            iterations_ics=results['iterations_ics'],
+            target_density_init=results['target_density_init'],
+            target_density_final=results['target_density_final'],
+            model=model,
+            boxsize=sim_config.box_size,
+            a_init=a_init,
+            a_final=a_final,
+            output_path=str(gif_path),
+            rtol=rtol,
+            atol=atol,
+            fps=gif_fps
+        )
+        logger.info(f"Saved GIF animation to: {gif_path}")
 
     # Print final statistics
     logger.info("=" * 70)
@@ -488,21 +512,26 @@ def extract_mask(
         logger.error("Failed to extract mask")
         raise typer.Exit(1)
 
-    mask, cropped_img = result
+    mask, cropped_img, intermediate_mask = result
 
-    # Compute statistics
+    # Compute statistics for final mask
     total_pixels = mask.size
     particle_pixels = np.sum(mask)
     fraction = particle_pixels / total_pixels
 
+    # Compute statistics for intermediate mask
+    inter_total = intermediate_mask.size
+    inter_particles = np.sum(intermediate_mask)
+    inter_fraction = inter_particles / inter_total
+
     logger.info("=" * 50)
     logger.info("MASK STATISTICS")
     logger.info("=" * 50)
-    logger.info(f"Shape: {mask.shape[0]} x {mask.shape[1]} pixels")
-    logger.info(f"Total pixels: {total_pixels:,}")
-    logger.info(f"Particle pixels: {particle_pixels:,}")
-    logger.info(f"Background pixels: {total_pixels - particle_pixels:,}")
-    logger.info(f"Particle fraction: {fraction:.4f} ({fraction*100:.2f}%)")
+    logger.info(f"Intermediate mask: {intermediate_mask.shape[0]} x {intermediate_mask.shape[1]} pixels")
+    logger.info(f"  Particle pixels: {inter_particles:,} ({inter_fraction*100:.2f}%)")
+    if resolution is not None:
+        logger.info(f"Final mask: {mask.shape[0]} x {mask.shape[1]} pixels")
+        logger.info(f"  Particle pixels: {particle_pixels:,} ({fraction*100:.2f}%)")
     logger.info("=" * 50)
 
     output_path = Path(output)
@@ -529,7 +558,7 @@ def extract_mask(
     logger.info(f"Debug comparison saved to: {debug_path}")
     plt.close(fig)
 
-    # Save mask image
+    # Save final mask image
     fig2, ax = plt.subplots(figsize=(8, 8))
     ax.imshow(mask, cmap='gray', interpolation='none')
     ax.set_title(f"Particle Mask ({mask.shape[0]}x{mask.shape[1]})")
@@ -540,10 +569,123 @@ def extract_mask(
     logger.info(f"Mask image saved to: {mask_img_path}")
     plt.close(fig2)
 
-    # Save numpy array
+    # Save final mask numpy array
     mask_npy_path = output_path / "particle_mask.npy"
     np.save(mask_npy_path, mask)
     logger.info(f"Mask numpy array saved to: {mask_npy_path}")
+
+    # Save intermediate (full-resolution square) mask
+    inter_mask_path = output_path / "intermediate_mask.npy"
+    np.save(inter_mask_path, intermediate_mask)
+    logger.info(f"Intermediate mask saved to: {inter_mask_path}")
+
+    # Plot intermediate mask
+    fig3, ax = plt.subplots(figsize=(8, 8))
+    ax.imshow(intermediate_mask, cmap='gray', interpolation='none')
+    ax.set_title(f"Intermediate Mask ({intermediate_mask.shape[0]}x{intermediate_mask.shape[1]})")
+    ax.axis('off')
+    plt.tight_layout()
+    inter_img_path = output_path / "intermediate_mask.png"
+    fig3.savefig(inter_img_path, dpi=150, bbox_inches='tight')
+    logger.info(f"Intermediate mask image saved to: {inter_img_path}")
+    plt.close(fig3)
+
+    # Compute overdensity from intermediate mask: δ = ρ/ρ̄ - 1
+    # where ρ = mask value (0 or 1), ρ̄ = mean(mask) = particle fraction
+    overdensity = intermediate_mask.astype(np.float32) / inter_fraction - 1.0
+    logger.info(f"Overdensity range: [{overdensity.min():.2f}, {overdensity.max():.2f}]")
+
+    # Save overdensity array
+    overdensity_path = output_path / "overdensity.npy"
+    np.save(overdensity_path, overdensity)
+    logger.info(f"Overdensity array saved to: {overdensity_path}")
+
+    # Plot overdensity
+    fig4, ax = plt.subplots(figsize=(8, 8))
+    vmax = np.percentile(np.abs(overdensity), 99)
+    im = ax.imshow(overdensity, cmap='RdBu_r', interpolation='none', vmin=-vmax, vmax=vmax)
+    ax.set_title(f"Overdensity δ ({intermediate_mask.shape[0]}x{intermediate_mask.shape[1]})")
+    ax.axis('off')
+    cbar = plt.colorbar(im, ax=ax, fraction=0.046, pad=0.04)
+    cbar.set_label(r"overdensity $\delta$")
+    plt.tight_layout()
+    overdensity_img_path = output_path / "overdensity.png"
+    fig4.savefig(overdensity_img_path, dpi=150, bbox_inches='tight')
+    logger.info(f"Overdensity plot saved to: {overdensity_img_path}")
+    plt.close(fig4)
+
+    # Create binned versions at multiple resolutions
+    target_resolutions = [16, 32, 64, 128]
+    logger.info("=" * 50)
+    logger.info("CREATING BINNED LOW-RES VERSIONS")
+    logger.info(f"Target resolutions: {target_resolutions}")
+    logger.info("=" * 50)
+
+    # Use 512 as base (covers all target resolutions with integer binning)
+    inter_size = intermediate_mask.shape[0]
+    pow2_size = 512
+    logger.info(f"Intermediate size: {inter_size} -> resampling to: {pow2_size}")
+
+    # Resize intermediate mask to 512x512 using bilinear interpolation
+    from PIL import Image as PILImage
+    inter_float = intermediate_mask.astype(np.float32)
+    inter_pil = PILImage.fromarray(inter_float, mode='F')
+    inter_pow2 = np.array(inter_pil.resize((pow2_size, pow2_size), PILImage.Resampling.BILINEAR))
+    logger.info(f"Resized to: {inter_pow2.shape}")
+
+    for res in target_resolutions:
+        logger.info("-" * 40)
+        logger.info(f"Processing resolution: {res}x{res}")
+
+        # Bin down to target resolution by averaging
+        bin_factor = pow2_size // res
+        logger.info(f"Binning factor: {bin_factor} (from {pow2_size} to {res})")
+
+        # Reshape and average to bin
+        binned = inter_pow2.reshape(res, bin_factor, res, bin_factor).mean(axis=(1, 3))
+
+        # Compute overdensity from binned density field
+        mean_density = binned.mean()
+        binned_overdensity = binned / mean_density - 1.0
+        logger.info(f"Mean density: {mean_density:.4f}, δ range: [{binned_overdensity.min():.2f}, {binned_overdensity.max():.2f}]")
+
+        # Save binned arrays
+        binned_path = output_path / f"binned_density_{res}.npy"
+        np.save(binned_path, binned)
+
+        binned_overdensity_path = output_path / f"binned_overdensity_{res}.npy"
+        np.save(binned_overdensity_path, binned_overdensity)
+        logger.info(f"Saved: binned_density_{res}.npy, binned_overdensity_{res}.npy")
+
+        # Plot binned density
+        fig5, ax = plt.subplots(figsize=(8, 8))
+        im = ax.imshow(binned, cmap='viridis', interpolation='none')
+        ax.set_title(f"Binned Density ({res}x{res})")
+        ax.axis('off')
+        cbar = plt.colorbar(im, ax=ax, fraction=0.046, pad=0.04)
+        cbar.set_label("density")
+        plt.tight_layout()
+        binned_img_path = output_path / f"binned_density_{res}.png"
+        fig5.savefig(binned_img_path, dpi=150, bbox_inches='tight')
+        plt.close(fig5)
+
+        # Plot binned overdensity
+        fig6, ax = plt.subplots(figsize=(8, 8))
+        vmax = np.percentile(np.abs(binned_overdensity), 99)
+        im = ax.imshow(binned_overdensity, cmap='RdBu_r', interpolation='none', vmin=-vmax, vmax=vmax)
+        ax.set_title(f"Binned Overdensity δ ({res}x{res})")
+        ax.axis('off')
+        cbar = plt.colorbar(im, ax=ax, fraction=0.046, pad=0.04)
+        cbar.set_label(r"overdensity $\delta$")
+        plt.tight_layout()
+        binned_overdensity_img_path = output_path / f"binned_overdensity_{res}.png"
+        fig6.savefig(binned_overdensity_img_path, dpi=150, bbox_inches='tight')
+        plt.close(fig6)
+
+        logger.info(f"Saved plots: binned_density_{res}.png, binned_overdensity_{res}.png")
+
+    logger.info("=" * 50)
+    logger.info("All resolutions complete!")
 
 
 def main():

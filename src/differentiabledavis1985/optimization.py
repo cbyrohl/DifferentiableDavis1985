@@ -65,7 +65,9 @@ def optimize_initial_conditions(
     print_every: int = 10,
     loss_type: str = "chi2",
     rtol: float = 1e-4,
-    atol: float = 1e-4
+    atol: float = 1e-4,
+    save_iterations: bool = False,
+    save_every: int = 1
 ) -> Tuple[jnp.ndarray, jnp.ndarray]:
     """
     Optimize initial conditions to match target final density.
@@ -85,11 +87,14 @@ def optimize_initial_conditions(
         loss_type: Type of loss ("chi2" or "chi2_log"), used if loss_fn is None
         rtol: Relative tolerance for ODE integrator (default 1e-4 for speed)
         atol: Absolute tolerance for ODE integrator (default 1e-4 for speed)
+        save_iterations: If True, save intermediate ICs during optimization
+        save_every: Save ICs every N iterations (only if save_iterations=True)
 
     Returns:
-        Tuple of (optimized_ics, loss_history)
+        Tuple of (optimized_ics, loss_history, iterations_ics)
         - optimized_ics: Optimized initial conditions
         - loss_history: Array of loss values during optimization
+        - iterations_ics: List of ICs at saved iterations (empty if save_iterations=False)
     """
     print(f"Starting optimization:")
     print(f"  Target shape: {target_density.shape}")
@@ -117,6 +122,7 @@ def optimize_initial_conditions(
 
     # Optimization loop
     losses = []
+    iterations_ics = []
     print("Starting optimization loop...", flush=True)
     print("NOTE: First iteration may take 30-60 seconds due to JAX compilation.", flush=True)
     print(f"{'Iteration':>10} | {'Loss':>12} | {'Time (s)':>10}", flush=True)
@@ -154,9 +160,13 @@ def optimize_initial_conditions(
                 est_total = avg_iter_time * n_iterations
                 print(f"  -> First iteration took {iter_time:.1f}s. Estimated total: {est_total:.1f}s (~{est_total/60:.1f} min)", flush=True)
 
+        # Save intermediate ICs if requested
+        if save_iterations and (iteration % save_every == 0 or iteration == n_iterations - 1):
+            iterations_ics.append((iteration, params.copy()))
+
     print()
     print("Optimization completed!")
-    return params, jnp.array(losses)
+    return params, jnp.array(losses), iterations_ics
 
 
 def generate_target_and_reconstruct(
@@ -167,7 +177,9 @@ def generate_target_and_reconstruct(
     learning_rate: float = 1e-1,
     loss_type: str = "chi2",
     rtol: float = 1e-4,
-    atol: float = 1e-4
+    atol: float = 1e-4,
+    save_iterations: bool = False,
+    save_every: int = 1
 ) -> dict:
     """
     Generate a target density field and reconstruct it (for testing).
@@ -207,40 +219,57 @@ def generate_target_and_reconstruct(
     print(f"Running forward simulation with seed {target_seed}...")
     target_positions, _ = model.run_simulation(target_ics, rtol=rtol, atol=atol)
 
-    # Paint target density
-    target_density = model.paint_density(target_positions[-1])
-    print(f"Target density stats: min={target_density.min():.2e}, "
-          f"mean={target_density.mean():.2e}, max={target_density.max():.2e}")
+    # Paint densities at initial and final times
+    target_density_init = model.paint_density(target_positions[0])
+    target_density_final = model.paint_density(target_positions[-1])
+
+    print(f"Target density (initial): min={target_density_init.min():.2e}, "
+          f"mean={target_density_init.mean():.2e}, max={target_density_init.max():.2e}, "
+          f"std={target_density_init.std():.2e}")
+    print(f"Target density (final):   min={target_density_final.min():.2e}, "
+          f"mean={target_density_final.mean():.2e}, max={target_density_final.max():.2e}, "
+          f"std={target_density_final.std():.2e}")
     print()
 
     print("=" * 60)
     print("RECONSTRUCTING")
     print("=" * 60)
 
-    # Reconstruct
-    reconstructed_ics, losses = optimize_initial_conditions(
-        target_density=target_density,
+    # Reconstruct (optimize to match final density)
+    reconstructed_ics, losses, iterations_ics = optimize_initial_conditions(
+        target_density=target_density_final,
         model=model,
         n_iterations=n_iterations,
         learning_rate=learning_rate,
         seed=reconstruction_seed,
         loss_type=loss_type,
         rtol=rtol,
-        atol=atol
+        atol=atol,
+        save_iterations=save_iterations,
+        save_every=save_every
     )
 
     # Run forward simulation with reconstructed ICs
     print("Running forward simulation with reconstructed ICs...")
     reconstructed_positions, _ = model.run_simulation(reconstructed_ics, rtol=rtol, atol=atol)
-    reconstructed_density = model.paint_density(reconstructed_positions[-1])
-    print(f"Reconstructed density stats: min={reconstructed_density.min():.2e}, "
-          f"mean={reconstructed_density.mean():.2e}, max={reconstructed_density.max():.2e}")
+    reconstructed_density_init = model.paint_density(reconstructed_positions[0])
+    reconstructed_density_final = model.paint_density(reconstructed_positions[-1])
+
+    print(f"Reconstructed density (initial): min={reconstructed_density_init.min():.2e}, "
+          f"mean={reconstructed_density_init.mean():.2e}, max={reconstructed_density_init.max():.2e}, "
+          f"std={reconstructed_density_init.std():.2e}")
+    print(f"Reconstructed density (final):   min={reconstructed_density_final.min():.2e}, "
+          f"mean={reconstructed_density_final.mean():.2e}, max={reconstructed_density_final.max():.2e}, "
+          f"std={reconstructed_density_final.std():.2e}")
     print()
 
     return {
         'target_ics': target_ics,
-        'target_density': target_density,
+        'target_density_init': target_density_init,
+        'target_density_final': target_density_final,
         'reconstructed_ics': reconstructed_ics,
-        'reconstructed_density': reconstructed_density,
+        'reconstructed_density_init': reconstructed_density_init,
+        'reconstructed_density_final': reconstructed_density_final,
         'losses': losses,
+        'iterations_ics': iterations_ics,
     }

@@ -19,6 +19,8 @@ class SimulationConfig:
         seed: int = 42,
         suffix: Optional[str] = None,
         n_steps_min: int = 2,
+        rtol: float = 1e-5,
+        atol: float = 1e-5,
     ):
         self.n_particles = n_particles
         self.omega_m = omega_m
@@ -29,6 +31,8 @@ class SimulationConfig:
         self.seed = seed
         self.suffix = suffix
         self.n_steps_min = n_steps_min
+        self.rtol = rtol
+        self.atol = atol
 
     @property
     def z_init(self) -> float:
@@ -79,6 +83,8 @@ class SimulationConfig:
             "seed": self.seed,
             "suffix": self.suffix,
             "n_steps_min": self.n_steps_min,
+            "rtol": self.rtol,
+            "atol": self.atol,
         }
 
     def __repr__(self) -> str:
@@ -90,5 +96,6 @@ class SimulationConfig:
             f"box_size={self.box_size}, "
             f"mesh_shape={self.mesh_shape}, "
             f"seed={self.seed}, "
-            f"n_steps_min={self.n_steps_min})"
+            f"n_steps_min={self.n_steps_min}, "
+            f"rtol={self.rtol}, atol={self.atol})"
         )
