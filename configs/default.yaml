@@ -1,0 +1,22 @@
+# Default simulation configuration
+
+# Number of particles per dimension (total particles = n_particles^3)
+n_particles: 32
+
+# Matter density parameter (Omega_m)
+omega_m: 0.3
+
+# Initial scale factor (a = 1/(1+z), so a=0.01 corresponds to z=99)
+a_init: 0.01
+
+# Final scale factor (a = 1.0 corresponds to z=0, present day)
+a_final: 1.0
+
+# Box size in comoving Mpc/h
+box_size: 100.0
+
+# Mesh cells per dimension for density field (null = auto-calculate as n_particles/2)
+mesh_shape: null
+
+# Random seed for initial conditions
+seed: 42

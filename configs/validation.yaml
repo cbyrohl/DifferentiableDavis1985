@@ -1,0 +1,23 @@
+# Simple validation configuration
+# Small-scale test case for validating simulation setup
+
+# Particles: 64^3 = 262,144 total
+n_particles: 64
+
+# Standard LCDM cosmology
+omega_m: 0.3
+
+# Initial scale factor (a=0.01 -> z=99)
+a_init: 0.01
+
+# Final scale factor (a=0.33 -> z~2)
+a_final: 0.33
+
+# Box size in comoving Mpc/h
+box_size: 100.0
+
+# Mesh shape: use half resolution for painting (32^3)
+mesh_shape: null
+
+# Random seed
+seed: 42

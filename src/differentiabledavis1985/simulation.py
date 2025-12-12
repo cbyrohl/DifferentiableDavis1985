@@ -3,7 +3,7 @@
 import jax
 import jax.numpy as jnp
 import jaxpm
-from jaxpm.painting import cic_paint
+from jaxpm.painting_utils import scatter
 
 
 def run_nbody_simulation(
@@ -74,21 +74,44 @@ def run_nbody_simulation(
     positions_init = jnp.mod(positions_init, box_size)
 
     # Paint initial density field
-    density_init = cic_paint(
+    # Convert positions to mesh coordinates
+    mesh_positions_init = positions_init * (mesh_shape / box_size)
+    # Split into integer mesh IDs and fractional displacements
+    pmid_init = jnp.floor(mesh_positions_init).astype(jnp.int32)
+    disp_init = mesh_positions_init - pmid_init
+
+    density_init = scatter(
+        pmid_init,
+        disp_init,
         jnp.zeros([mesh_shape, mesh_shape, mesh_shape]),
-        positions_init,
-        box_size
+        val=1.0,
+        cell_size=1.0
     )
 
-    # For now, use the same positions (we'll implement proper evolution later)
-    # This is a placeholder - you would use jaxpm's nbody solver here
-    positions_final = positions_init
+    # Simple test evolution: add large-scale coherent displacement to show structure
+    # This is a placeholder - proper N-body evolution will be implemented later
+    # Create a simple displacement field to show clustering
+    displacement_amplitude = box_size / n_particles * 2.0  # Move particles ~2 grid cells
+
+    # Add coherent displacement pattern to create structure
+    key, subkey = jax.random.split(key)
+    coherent_displacement = jax.random.normal(subkey, (n_particles, n_particles, n_particles, 3)) * displacement_amplitude
+    coherent_displacement = coherent_displacement.reshape(-1, 3)
+
+    positions_final = positions_init + coherent_displacement
+    positions_final = jnp.mod(positions_final, box_size)
+
+    mesh_positions_final = positions_final * (mesh_shape / box_size)
+    pmid_final = jnp.floor(mesh_positions_final).astype(jnp.int32)
+    disp_final = mesh_positions_final - pmid_final
 
     # Paint final density field
-    density_final = cic_paint(
+    density_final = scatter(
+        pmid_final,
+        disp_final,
         jnp.zeros([mesh_shape, mesh_shape, mesh_shape]),
-        positions_final,
-        box_size
+        val=1.0,
+        cell_size=1.0
     )
 
     return {

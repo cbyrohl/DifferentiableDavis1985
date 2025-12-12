@@ -12,10 +12,20 @@ from differentiabledavis1985.davis1985_models import (
     Fig1BottomLeftSimulation,
     EdS1Simulation,
 )
+from differentiabledavis1985.losses import (
+    chi2,
+    chi2_log,
+    reduced_chi2,
+    reduced_chi2_log,
+)
 
 __all__ = [
     "BaseSimulation",
     "Davis1985Simulation",
     "Fig1BottomLeftSimulation",
     "EdS1Simulation",
+    "chi2",
+    "chi2_log",
+    "reduced_chi2",
+    "reduced_chi2_log",
 ]

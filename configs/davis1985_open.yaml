@@ -1,0 +1,29 @@
+# Davis et al. (1985) simulation parameters - Model O1
+# Reproducing the original CDM simulation from ApJ 292, 371-394
+# Figure 1, Right Column (Open Universe, Omega evolves)
+
+# Particles: 32,768 total (32^3)
+n_particles: 32
+
+# Open universe cosmology
+# Omega = 1.0 initially, evolves to 0.2 at a=3.2, then to 0.09 at a=8.4
+omega_m: 0.2
+
+# Initial conditions epoch
+# Paper starts at a=1.0 (using Zel'dovich approximation)
+a_init: 1.0  # Omega=1.0 at start
+
+# Evolution targets from Figure 1:
+# - a=3.2 (Omega=0.2, matched to EdS1 at a=1.8 by linear growth factor)
+# - a=8.4 (Omega=0.09, matched to EdS1 at a=2.4 by linear growth factor)
+a_final: 3.2  # Figure 1 center right panel
+
+# Box size: Scaled to represent 162.5 h^{-2} Mpc at a=3.2
+# At initial epoch, equivalent to EdS1 box but with reduced mass
+box_size: 162.5
+
+# Force calculation mesh: 64^3 cells (P^3M method)
+mesh_shape: 64
+
+# Random seed
+seed: 1985

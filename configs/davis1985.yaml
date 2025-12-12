@@ -1,0 +1,30 @@
+# Davis et al. (1985) simulation parameters - Model EdS1
+# Reproducing the original CDM simulation from ApJ 292, 371-394
+# Figure 1, Left Column (Einstein-de Sitter, Omega=1)
+
+# Particles: 32,768 total (32^3)
+n_particles: 32
+
+# Einstein-de Sitter cosmology (flat, matter-dominated)
+omega_m: 1.0
+
+# Initial conditions epoch
+# Paper starts at a=1.0 (using Zel'dovich approximation)
+a_init: 1.0  # z = 0 (start)
+
+# Evolution targets from Figure 1:
+# - a=1.8 (linear growth factor = 1.8)
+# - a=2.4 (linear growth factor = 2.4, shows filaments)
+# - a=4.5 (large clumps, clustering scale ~ box size)
+a_final: 2.4  # Figure 1 bottom left panel
+
+# Box size: 32.5 h^{-2} Mpc (comoving)
+# Note: This is physically ~32.5 Mpc for h=1
+box_size: 32.5
+
+# Force calculation mesh: 64^3 cells (P^3M method)
+# For density painting, using same resolution
+mesh_shape: 64
+
+# Random seed
+seed: 1985
