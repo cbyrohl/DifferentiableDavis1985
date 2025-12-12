@@ -1,0 +1,1295 @@
+1985ApJ. . .292. .371D
+
+
+                         The Astrophysical Journal, 292:371-394,1985 May 15
+                         © 1985. The American Astronomical Society. All rights reserved. Printed in U.S.A.
+
+
+
+
+                                         THE EVOLUTION OF LARGE-SCALE STRUCTURE IN A UNIVERSE DOMINATED BY COLD
+                                                                      DARK MATTER
+                                                         Marc Davis,1,2 George Efstathiou,1,3 Carlos S. Frenk,1,4 and Simon D. M. White1,5
+                                                                              Received 1984 August 20; accepted 1984 November 30
+                                                                                           ABSTRACT
+                                          We present the results of numerical simulations of nonlinear gravitational clustering in universes dominat-
+                                       ed by weakly interacting, “ cold ” dark matter (e.g., axions or photinos). These studies employ a high resolution
+                                       iV-body code with periodic boundary conditions and 32,768 particles; they can accurately represent the theo-
+                                       retical initial conditions over a factor of 16 in length scale. We have followed the evolution of ensembles of
+                                       models with Q = 1 and Del from the initial conditions predicted for a “ constant curvature ” primordial
+                                       fluctuation spectrum. We also ran one model of a flat universe with a positive cosmological constant. Large
+                                       filamentary structures, superclusters of clumps, and large low-density regions appear at certain times in all our
+                                       simulations; however, we do not find large regions as extreme as the apparent void in Bootes. The evolution
+                                       of the two-point correlation function, ^(r), is not self-similar; its effective power-law index becomes more nega-
+                                       tive with time. Models with Q = 1 are inconsistent with observation if galaxies are assumed to be unbiased
+                                       tracers of the underlying mass distribution. The peculiar velocities of galaxies are predicted to be much too
+                                       large. In addition, at times when the shape of ^(r) matches that observed, the amplitude of clustering is
+                                       inferred to be too small for any acceptable value of the Hubble constant. Better agreement is obtained for
+                                       Q = 0.2, but in both cases the rms relative peculiar velocity of particle pairs decreases markedly with pair
+                                       separation, whereas the corresponding quantity for galaxies is observed to increase slowly. In all models the
+                                       three-point correlation function Ç is found to fit the observed form, Ç oc Q^2, but with Q depending weakly on
+                                       scale. On small scales Q substantially exceeds its observed value. Consistent with this, the mass distribution of
+                                       clusters is very broad, showing the presence of clumps with a very wide range in mass at any given time. The
+                                       model with a positive cosmological constant closely resembles an open model with the same value of Q. If
+                                       galaxies are a random sampling of the mass distribution, none of our models is fully consistent with observa-
+                                       tion. An alternative hypothesis is that galaxies formed only at high peaks of the initial density field. The clus-
+                                       tering properties of such “ galaxies ” are biased ; they appear preferentially in high-density regions and so are
+                                       more correlated than the overall mass distribution. Their two- and three-point correlation functions and their
+                                       relative peculiar velocity distribution may be consistent with observation even in a universe with Q = 1. If this
+                                       is an appropriate model for galaxy formation, it may be possible to reconcile a flat universe with most aspects
+                                       of the observed galaxy distribution.
+                                       Subject headings: galaxies:.clustering — galaxies: formation — numerical methods
+
+                                                   I. INTRODUCTION                                                  fundamental parameters of our universe may be explained in a
+                             The fundamental problem of understanding the structure of                              natural fashion. Inflationary models make a specific prediction
+                          our universe can be approached by phenomenological study of                               for the form of the density perturbation spectrum from which
+                          its present configuration or by analytical study of its origins. In                       observed structure must grow (Guth and Pi 1982; Hawking
+                          recent years considerable progress has been made on both                                  1982; Starobinskii 1982; Bardeen, Steinhardt, and Turner
+                          these fronts, but it has become clear that a major difficulty lies                        1983). Perturbations in curvature arise from quantum fluctua-
+                          in bridging the gap between them. Large-scale surveys of                                  tions during inflation. The time invariance of de Sitter space
+                          galaxy redshifts have revealed many aspects of the three-                                 ensures that their amplitude as they are swept across the event
+                          dimensional morphology of the galaxy distribution. (See the                               horizon during the inflationary epoch, and consequently as
+                          recent reviews Oort 1983; Davis 1984.) At the same time there                             they return across it in the present Friedmann universe, is
+                          has been widespread enthusiasm in the cosmological com-                                   independent of scale. Their distribution thus has the Harrison-
+                          munity over new ideas injected both by Grand Unified Theo-                                Zel’dovich “constant curvature” form. Perturbations gener-
+                          ries and by the possibility of an early inflationary epoch. The                           ated in this way are adiabatic, with no fluctuation in
+                          present ratio of photons to baryons may be explained by non-                              photon-to-baryon ratio. So far inflationary models have been
+                          equilibrium particle interactions at grand unification energies                           able to predict the correct fluctuation amplitude only for very
+                          (Weinberg 1979), while inflation can account for the homo-                                specific and finely tuned theories for the underlying particle
+                          geneity and flatness of the universe and for the low abundance                            physics. The prediction of an adiabatic scale-invariant spec-
+                                                                                                                    trum is not, however, restricted to such models (see, e.g., Harri-
+                          of magnetic monopoles (Guth 1981). Thus some of the most
+                                                                                                                    son 1970; Zel’dovich 1972; Kibble 1976; Turner and Schramm
+                              1
+                                                                                                                     1978; Press 1980).
+                              2
+                                Institute for Theoretical Physics, University of California, Santa Barbara.            If any inflationary model is valid, the present value of the
+                              3
+                                Astronomy and Physics Departments, University of California, Berkeley.              cosmological density parameter Q is expected to be very close
+                                Institute of Astronomy, University of Cambridge.
+                              4
+                                Astronomy Centre, University of Sussex.                                             to unity. Constraints from Big Bang nucleosynthesis suggest,
+                              5
+                                Steward Observatory, University of Arizona.                                         however, that the density of baryonic material is an order of
+                                                                                                              371
+
+
+                                           © American Astronomical Society • Provided by the NASA Astrophysics Data System
+1985ApJ. . .292. .371D
+
+
+                         372                                                        DAVIS ET AL.                                                        Vol. 292
+
+                         magnitude lower (Yang et al 1984). Furthermore, in a purely         result the fluctuation spectrum develops a bend at a scale cor-
+                         baryonic universe an adiabatic constant-curvature spectrum          responding to the horizon size at the transition between the
+                         leads to small-scale anisotropies in the microwave background       two epochs. For a constant-curvature initial spectrum, the
+                         in excess of the reported upper limits (Wilson and Silk 1981;       power density at late times at comoving wavenumber k tilts
+                         Uson and Wilkinson 1984). These apparent inconsistencies are        gradually from the Harrison-Zerdovich form, \ôk\2cck, to
+                         avoided if the dark matter that appears to dominate the             |<5fc|2 oc k-3 over more than two decades in scale. It is well
+                         dynamics of galaxy clusters and of the universe as a whole is       approximated by the following expression :
+                         made up of weakly interacting, nonbaryonic elementary par-
+                         ticles. Candidate particles can be grouped into three categories                  \ôk\2 = Ak/(\ + a/c + ßk312 + yk2)2 ,              (2)
+                         on the basis of their effect on the fluctuation spectrum (Bond et   where A is a normalization constant. If k is expressed in terms
+                         al 1983). If the dark matter is composed of abundant light          of present length units, the parameters in equation (2) take the
+                         particles which remain relativistic until shortly before recombi-   values a = 1.7/, ß = 9.0/3/2, y = 1.0/2, where / = (Q/z20-2)-1
+                         nation, then it may be termed “ hot.” The best candidate for hot    Mpc, h = H0/100 km s_1 Mpc-1, Q is the present cosmo-
+                         dark matter is a neutrino with a mass in the range 10 eV <          logical density parameter, and 6 is the microwave background
+                         mv < 100 eV. The phase mixing of freely streaming relativistic      temperature in units of 2.7 K. This fit is based on the numerical
+                         particles erases density fluctuations of scale smaller than the     calculations of Blumenthal and Primack (1983) and of Bond
+                         horizon, and for massive neutrinos detailed calculations show       and Efstathiou (1984), which have Q = 1 and 9=1 and include
+                         that fluctuations are damped out if their present wavelength is     three massless neutrino flavors. If the baryon density is small
+                         less than the critical damping scale :                              compared to that of the CDM, Silk damping has a negligible
+                                                                                             effect on the CDM fluctuation spectrum and the scaling with /
+                                               = 41(mv/30 eV) -1 Mpc                   (1)
+                                                                                             becomes exact; otherwise it is approximate. The scaling of l
+                         (Peebles 1982; Bond and Szalay 1983). A second possibility is       with Qh29~2 simply reflects that of the horizon diameter when
+                         for the dark matter particles to interact more weakly than          matter and radiation had equal energy density; it is indepen-
+                         neutrinos, to be less abundant, and to have a mass of order 1       dent of the nature of the CDM. As a result, it may be possible
+                         keV. Such particles are termed “warm” dark matter, because          to constrain this combination of cosmological parameters by
+                         they have lower thermal velocities than massive neutrinos and       requiring the nonlinear structure that forms at late times to
+                         are able to erase fluctuations only on wavelengths smaller than     agree with observation. Alternatively, it may be possible to
+                         about 1 Mpc, corresponding roughly to the mass of a bright          reject the CDM model, if we find no match to the observations
+                         galaxy. There are, at present, few candidate particles which fit    for acceptable values of the cosmological parameters. Since the
+                         this description. Gravitinos and photinos have been suggested       overall amplitude of fluctuations cannot, at present, be calcu-
+                         (Pagels and Primack 1982; Bond, Szalay, and Turner 1982),           lated a priori, we are free to adjust it to give the correct level of
+                         but currently it seems more likely that supersymmetric par-         clustering today. This is the only free parameter of the model.
+                         ticles have a mass in excess of 1 GeV. Any particles which             In this paper we study the nonlinear evolution of clustering
+                         became nonrelativistic very early, and so were able to diffuse a    from the linear initial conditions characterized by equation (2).
+                         negligible distance, are termed “ cold ” dark matter (CDM).         Analytic treatments of this problem can be carried through
+                         There are many candidates for CDM, including super-                 only for simple, highly symmetric models of clusters or voids.
+                         symmetric particles (with masses above 1 Gev) and axions with       Peebles (1984) and Blumenthal et al (1984) have investigated
+                         a mass of 10~5 eV (Preskill, Wise, and Wilczek 1983).               the cosmogony of CDM universes by applying scaling argu-
+                            A priori the most plausible elementary-particle candidate for    ments based on such models to the predictions of linear theory.
+                         the dark matter would seem to be the neutrino. Extensive            While these studies give considerable insight into galaxy for-
+                         studies of a neutrino-dominated universe have been carried out      mation, clustering patterns in the real universe show no special
+                         using analytic and AT-body techniques, while related studies        symmetry, and direct simulations are required to study their
+                         have focused on the hydrodynamics of pancake formation and          morphology and their statistical properties. We have studied
+                         cooling (Klypin and Shandarin 1983; Frenk, White, and Davis         the full nonlinear problem by running ensembles of iV-body
+                          1983; Centrella and Melott 1983; White, Frenk, and Davis           simulations of Einstein-de Sitter, and of open Friedmann
+                          1983; Shapiro, Struck-Marcell, and Melott 1983; Bond et al         models, together with one simulation with zero curvature but
+                          1983). The transient filamentary structure that forms in these     with a nonzero cosmological constant, A > 0. Our models
+                         models is reminiscent of the long supercluster chains apparent      have an initial resolution limit corresponding to a present scale
+                         in the galaxy distribution. However, it is not possible to recon-   in excess of 2 Mpc and so are insensitive to details of the initial
+                         cile the relatively small length-scale of galaxy clustering with    spectrum below this wavelength. As a result, the nonlinear
+                         the large length-scale of equation (1), unless galaxies formed at   clustering that they develop differs very little from that
+                         unacceptably recent epochs and in a manner very different           expected in a universe dominated by warm dark matter.
+                         from that predicted in the standard pancake picture. For these         Results from a single simulation of an “ axion/gravitino/
+                         and other reasons, it is very unlikely that stable massive neu-     photino-dominated universe ” have been published previously
+                         trinos dominate the universe (White, Frenk, and Davis 1983;         by Melott et al (1983). Unfortunately, these authors chose an
+                         White, Davis, and Frenk 1984).                                      initial power spectrum (power-law segments with n = 1 and
+                            Detailed calculations of the linear evolution of the CDM         n = —3 separated by a sharp break) which is an extremely
+                         density-perturbation spectrum have been given by several            poor approximation to that expected in a universe dominated
+                         authors (Peebles 1982, 1984; Blumenthal and Primack 1983;           by cold dark matter (eq. [2]). In addition they used a particle-
+                          Bond and Efstathiou 1984). During the radiation-dominated          mesh code on a 323 grid, and so had too little resolution to be
+                         epoch, fluctuations grow significantly only while their wave-       able to follow the hierarchical growth of structure from small
+                         length exceeds the horizon scale. However, once the universe is      scales (see Efstathiou et al 1985, hereafter EDFW). As a result,
+                         matter-dominated, all linear modes grow at the same rate. As a       the relevance of their work to CDM universes is unclear.
+
+
+
+
+                                    © American Astronomical Society • Provided by the NASA Astrophysics Data System
+1985ApJ. . .292. .371D
+
+
+                         No. 2, 1985                             EVOLUTION OF LARGE-SCALE STRUCTURE                                                                      373
+
+                            In § II we describe our numerical methods and the way in           mode was present. Since we used 323 particles, waves with a
+                         which we generate initial conditions, and we catalog the simu-        projected wavelength along any coordinate axis less than L/16
+                         lations we have performed. The evolution of the fundamental           were undersampled; initial perturbations cannot be generated
+                         statistical properties of the models (power spectra, two- and         at such high frequencies. We therefore chose the amplitude of
+                         three-point correlation functions, velocity correlations, multi-      the initial perturbations so that the theoretically predicted
+                         plicity functions, cluster properties, and cell-count                 power would be equal to the white-noise level at a wavelength
+                         distributions) is described in § III, where we also discuss their     of L/16. Tests show that this choice leads to the best possible
+                         compatibility with observation. In § IV we present graphical          random-phase representation of the theoretical spectrum and
+                         comparisons of our open models with the observed galaxy               that the subsequent evolution of all structures made up of more
+                         distribution in a large redshift survey. We conclude from the         than a few particles is unaffected by residual artificialities of the
+                         data in these two sections that an Q = 1 model is quite unac-         method (see EDFW § V, and Figs. 2 and 5 below). For our
+                         ceptable if galaxies trace the mass distribution and that models      Einstein-de Sitter models we used equation (2) with the par-
+                         with Q. ^ 0.2, while better, still do not provide a fully accept-     ameters as given; for our open models we used parameters
+                         able match to observation. Finally, in § V we investigate the         obtained by fitting this equation to Blumenthal and Primack’s
+                         consequences of relaxing the assumption that the galaxy dis-          (1983) results for Q = 0.2. The resulting spectra agree quite well
+                         tribution follows the mass. Instead we identify “ galaxies ” with     with the expected scaling; small residual differences are reflec-
+                         high peaks in the initial density distribution; such points form      ted in a reduction of power in the open models by about 10%
+                         a biased subset of the overall mass distribution and have             at long wavelengths (see Fig. 2b).
+                         enhanced correlation properties. This procedure models a situ-           Because the linear CDM fluctuation spectrum has consider-
+                         ation in which galaxy formation was suppressed except in suffi-       able power on large scales, statistically equivalent initial condi-
+                         ciently dense regions. It leads to models which can agree with        tions can lead to substantially different levels of clustering even
+                         observation quite well even for Q = 1. Conclusions and general        after expansion by quite a modest factor. Thus several simula-
+                          remarks are given in § VI.                                           tions from different realizations of the same initial spectrum
+                                                                                               must be compared to assess the statistical uncertainties in the
+                                                 II. THE SIMULATIONS                           results. Furthermore, although the spectrum behaves asymp-
+                            All the simulations discussed here were done on VAX com-           totically as I 12 oc kn, with n = 1 on large scale and n = — 3 on
+                         puters using a particle-particle/particle-mesh code (P3M;             small scale, the transition between these two regimes is quite
+                         Efstathiou and Eastwood 1981 ; Hockney and Eastwood 1981).            slow; the length scales where n = 0.5 and n = —2.5 differ by a
+                         This code was designed to have high force resolution and uses         factor of 100 (cf. eq. [2]). Since we can reproduce this spectrum
+                         a comoving formulation of the equations of motion to follow           only over a factor of 16 in scale, simulations in different-size
+                         evolution within the fundamental cube of a triply periodic uni-       “boxes” are useful to extend the dynamic range of our results
+                         verse; a detailed examination of its performance and a com-           and to study the effect of their limited resolution.
+                         parison with simpler particle-mesh codes are given by EDFW.              We ran three ensembles of simulations with the physical
+                         In our models the long-range force field was calculated by            parameters given in Table 1. While h and 0 affect the simula-
+                         Fourier methods on a grid of 643 cells. Inclusion of a short-         tions only through their relation to the length scale L, the value
+                         range force correction resulted in point-mass interactions            of Q influences the dynamical evolution and so must be speci-
+                         between particles separated by more than a softening length,          fied separately. Henceforth we assume 9=1. Models EdSl-5
+                         rj = L/213, where L is the comoving length of the side of our         represent an D = 1 universe with L = 32.5h~2 Mpc in present
+                         computational volume. At separations smaller than rç our force        units. Models 01-4 were evolved from similar initial condi-
+                         law corresponded to the interaction of two interpenetrating           tions, but the mass of each particle was reduced so that Q = 0.2
+                         spheres with radii rç/2 and linear density profiles. We applied       after an expansion of 3.2. If this time is identified with the
+                         the short-range correction only at separations below 9rj; the         present, then L = 162.5/i-2 Mpc. Output times were chosen so
+                         discontinuity in the total force at this separation was less than     that the linear growth factors in the two ensembles would
+                         2%, and the force field was isotropic on all scales to much           match. Models EdS6-8 also had Q = 1, but the present size of
+                         better accuracy than this. All our simulations integrated the         the box was taken to be L = 65h~2 Mpc. Again the output
+                         motion of 32,768 particles using a leapfrog scheme with a, the        times were chosen so that one could compare these results to
+                         expansion parameter, as the time variable and a timestep of           EdSl-5 at the same linear fluctuation amplitude. Finally, we
+                         Aa = 0.02. Their accuracy can be judged using the Layzer-             ran a single model (LI) of a universe with zero curvature and a
+                         Irvine cosmic energy equation; typically the integration con-
+                         stant in the integral form of this equation had changed by less                                      TABLE 1
+                         than 0.1 % of the current potential energy at any stage of a run                                  Model Parameters
+                         (see EDFW). The longest simulations were integrated until
+                         a = 8.4 and took about 70 hours of CPU time on a VAX                                                 L        t]     Mt          mp
+                                                                                                        Model                 (/)     (/)     (m)      (10"4m)        Q,-
+                          11/750.
+                            We generated initial conditions using the Zel’dovich (1970)           EdSl-EdS5                  32.5    0.15      9.4        2.9       1
+                         approximation, following the algorithm described by EDFW.                EdS6-EdS8                  65.0    0.30     75         23         1
+                         Starting with the particles on a cubic lattice, we assigned a            LI                         32.5    0.15      9.4        2.9       0.796
+                                                                                                  01-04....                  32.5    0.15      9.4        2.9       0.446
+                         displacement and peculiar velocity to each in proportion to the
+                         gradient of the potential derived from a random realization of              Note.—L is the side of the computational box, MT the total mass it
+                         the linear fluctuation distribution. The latter corresponded to a        contains, t] the softening length of the force law, and mp the mass of an
+                         superposition of 643 waves with random phases and with                   individual    particle. The length and mass units are defined by
+                                                                                                  / = {Qh29~2)~l Mpc and m = lO15(nh2)~206 M0, where Q, h, and 6
+                         amplitudes distributed normally with variance given by equa-             denote the present value of the cosmological parameters. Q,- is the value
+                         tion (2). In all cases velocities were set so that only the growing      of Q at the start of the simulations.
+
+
+
+                                    © American Astronomical Society • Provided by the NASA Astrophysics Data System
+1985ApJ. . .292. .371D
+
+
+
+
+                         © American Astronomical Society   Provided by the NASA Astrophysics Data System
+1985ApJ. . .292. .371D
+
+
+                                                                         EVOLUTION OF LARGE-SCALE STRUCTURE                                                                               375
+                         positive cosmological constant. Its initial condition matched                         but is otherwise very close to the input theoretical power spec-
+                         those of EdSl and Ol, and the initial values of Q and A were                          trum; remaining differences at small k are due to sampling
+                         chosen so that when Q = 0.2 the linear fluctuation growth                             noise. (Here and below we quote values of k in units such that
+                         factors in Ol and LI would agree. Because of our adopted                              k = 1 corresponds to the fundamental wave of our box.) The
+                         normalization there are substantial initial fluctuations on small                     effective spectral index for this initial condition ranges from
+                         scales, so that many small objects collapse immediately after                         n ^ — 1 for 1 < k < 6ton & —2 for 6 < /c < 12. At later times
+                         the start of a simulation. The steep initial spectrum then results                    and at high wave number (/c > 16), the power in excess of white
+                         in the rapid formation of larger structures as evolution pro-                         noise is reduced somewhat as a result of the smoothing intro-
+                         ceeds. For models EdSl-5 the clustering scale approaches the                          duced by the mass assignment; it is also affected slightly by
+                         box size for a > 4 and the experiments must be terminated.                            aliasing from wavenumbers with k > 32. In linear theory, all
+                                                                                                               Fourier modes grow at the same rate, and | <5fc |2 oc a2 for Q = 1.
+                                          III. THE EVOLUTION OF CLUSTERING                                     We can check that the models remain linear on the largest
+                                                                                                               scales by measuring the growth rate of the /c = 1 mode and
+                                            a) Morphology of Clustering                                        checking that it follows this scaling. In Figure 2a the growth
+                            We begin by examining pictures of the models to get a quali-                       expected is 12.2, slightly greater than the factor 10.5 found
+                         tative feel for the results. Figure 1 shows four projections of                       from the data; the discrepancy appears only at the end of the
+                         model EdSl and two of Ol; the times plotted for Ol were                               simulations. Once the fundamental mode becomes nonlinear,
+                         chosen so that its linear-fluctuation amplitude corresponded to                       its growth rate is expected to decrease in this way (cf. EDFW).
+                         that of EdSl at the two intermediate times. The initial condi-                        In the present models the fundamental mode saturates and
+                         tions of the two models are almost indistinguishable, so only                         grows very slowly for a > 4. At this stage, the periodic bound-
+                         those of EdSl are shown. Note that they have substantial                              ary conditions are becoming unrealistic, and the integration
+                         large-scale fluctuations, and that careful examination reveals a                      must be stopped. This reflects the fact that there is only a
+                         trace of the underlying grid from which the particles were per-                       relatively small time window between the collapse of the small-
+                         turbed. As the simulation evolves, structure appears very                             est and largest structures in our models.
+                         rapidly, and filaments, superclusters of clumps, and large low-                          Figure 2b shows the evolution of the power spectrum of our
+                         density regions develop. The range of structure present is much                       ensemble of open models. The corresponding results from
+                         richer than in similar models evolved from white-noise initial                        Figure 2a are superposed in order to facilitate comparison and
+                         conditions (Efstathiou and Eastwood 1981; Efstathiou and                              have been multiplied by 0.9 to account for the slight difference
+                         Barnes 1983). Because of the strong subclustering which is                            between the theoretical input spectra (see § II). The growth of
+                         present, the filaments and voids in these models are less con-                        large-scale perturbations (k < 8) matches extremely well in the
+                         spicuous than in simulations of neutrino-dominated universes.                         two sets of models, even though nonlinearities appear to have
+                         At times a = 1.8 in EdSl and a = 3.2 in Ol, the two-point                             affected the evolution significantly for k > 4. At higher fre-
+                         correlation function is close to a power law, ^ocr_v, with                            quencies (k > 8) and at later times, there is an excess of power
+                         y = 1.8; under an appropriate scaling, these pictures might                           in the open models. This excess *eflects the difference in cluster
+                         therefore be considered a reasonable statistical match to the                         concentration visible in Figure 1 and is a consequence of the
+                         observed galaxy distribution (however, see our more detailed                          larger expansion of the open models after cluster collapse.
+                         analysis below). At later times much of the substructure is                           When times with the same linear growth factor are compared,
+                         erased as clumps merge into larger and larger systems. By the                         the power spectrum of the model with a positive cosmological
+                         end of the integration of EdSl, at a = 4.5, the distribution is                       constant is very similar to that of the corresponding open
+                         dominated by a few large clumps with little apparent substruc-                        model but with slightly less power at high frequency.
+                         ture. Note how closely the structure matches in the two models                           An important test of the simulations comes from compari-
+                         with different values of Q. Nevertheless, it is clear that clusters                   son of the power spectra for calculations in boxes of different
+                         are more concentrated in the open model. The simulation with                          size. Figure 3 shows the evolution of the power spectrum of the
+                         a positive cosmological constant matches Ol very closely at                           “large box” ensemble superposed on the appropriately shifted
+                         the time when Q = 0.2 and the linear growth factor is 1.8 in                          version of the data from Figure 2a. There are no free-fitting
+                         both models.                                                                          parameters in this comparison and, in the absence of spurious
+                                                                                                               effects due to the finite particle number and the finite box size,
+                              b) Power Spectra and Two-Point Correlation Functions                             the two power spectra should coincide. At large k there are
+                            In this section we consider the power spectrum | <5fc |2 of our                    slight differences due to the smoothing inherent in our method
+                         simulations and its Fourier transform, the two-point correla-                         for calculating the power spectrum, but in the range 2 < /c < 8
+                         tion function Ç(r). To obtain power spectra we derived a                              the agreement is very good. This shows that the evolution of
+                         density field from the point distribution using a nearest-grid-                       the Fourier components accessible to the “small box” calcu-
+                         point mass assignment on a 643 grid; we then Fourier trans-                           lation is not affected by its finite size. In principle, we could
+                         formed the result and binned the power density to the nearest                         thus use linear theory to specify the evolution of longer wave-
+                         integral wavenumber (see EDFW). The evolution of the power                            length components and so embed our models in an “ infinite ”
+                         spectrum for EdSl-5 is shown in Figure 2a. At the initial time                         universe. We have not bothered to do this because the
+                         the spectrum flattens to the white noise level for /c > 16, the                        neglected large-scale power is quite small at the times that
+                         Nyquist frequency corresponding to the initial particle grid,                         interest us. The evolution of the power spectra in Figures 2 and
+
+
+                            Fig. 1.—Two-dimensional projections of the particle positions in an Einstein-de Sitter and an open CDM simulation. The initial conditions for EdSl are shown
+                         at top left. Subsequent plots show the model after expansion by factors, a = l.% (center left), a = 2.4 (bottom left), and a = 4.5 (top right). The remaining two plots
+                         show Ol at a = 3.2 when the linear growth factor from its initial conditions is 1.8 and Q = 0.2 (center right), and at a = 8.4 when the growth factor is 2.4 and
+                         Q = 0.09. Note that the side of the box corresponds to 32.5(Q/z2)“1 Mpc in these models, where Q and h are the present values of the cosmological parameters.
+
+
+
+
+                                      © American Astronomical Society • Provided by the NASA Astrophysics Data System
+1985ApJ. . .292. .371D
+
+
+
+
+                                                                                     ’S g
+                                                                                      e 2
+
+                                                                                        IS
+                                                                                      S Q
+
+
+                                                                                      c» ^o
+                                                                                       U «
+                                                                                       £\cT
+                                                                                       ^o .s
+                                                                                     Æ*-*<u ^
+                                                                                            ’Scd
+                                                                                     'S ^ Os
+
+                                                                                     ^ c c
+                                                                                      o g .2
+                                                                                      ü 5b ^
+                                                                                      (U 2-^
+                                           C\2                                       H St
+                                                                                     CNi^i
+                                                                                         O g
+                                                                                      ^ *0 ^
+                                                            §
+                                                     2rpi    °i
+
+
+
+
+                                                                  376
+
+
+
+
+                         © American Astronomical Society • Provided by the NASA Astrophysics Data System
+1985ApJ. . .292. .371D
+
+
+
+
+                            Fig. 3.—The evolution of the power spectrum of the “big box” models, EdS6-8, is compared with appropriately shifted results for our “standard” models,
+                         EdSl-5 (shown as solid lines). The agreement at small wavenumber shows that the evolution of large-scale structure in the standard models has not been adversely
+                         affected by the absence of wavelengths larger than the box size.
+
+
+
+
+                            Fig. 4.—Two-point correlation functions £(r) are shown for models {a) EdSl-5 and (b) OM, for various values of the expansion parameter a. The separation r is
+                         given in units of the side of the computational volume. The error bars give errors in the mean derived from the scatter within each ensemble. The dotted line is a
+                         power law with the index y = 1.8, which fits the galaxy distribution. The solid lines in (b) repeat the results in (a) after multiplication by 0.9. An arrow in each panel
+                         marks the softening length of our simulations.
+                                                                                                           377
+
+
+
+
+                                      © American Astronomical Society • Provided by the NASA Astrophysics Data System
+1985ApJ. . .292. .371D
+
+
+                         378                                                                     DAVIS ET AL.                                                                   Vol. 292
+
+                         3 is such that as short-wavelength modes go nonlinear, they
+                         grow more rapidly than the linear mode, resulting in a pro-
+                         gressive flattening of the power spectra. The power spectra do
+                         not evolve in a self-similar fashion.
+                            A corresponding lack of self-similarity is shown by the evol-
+                         ution of the two-point correlation function <^(r), which we plot
+                         in Figure 4a for models EdSl-5. In order to achieve the highest
+                         possible resolution, correlation functions were computed by
+                         pair counts rather than by a Fourier transform of the power
+                         spectrum; all pairs were used for log (r/L) < —1, and about
+                         10% of pairs were used for larger separations. The effects of
+                         force softening are apparent as a slight flattening of ^(r) on the
+                         smallest scales shown [recall that log (rj/L) = —2.3],but gener-
+                         ally the correlations have near power-law form on large scales.
+                         Note that ^(r) steepens with time and has a power-law index
+                         y = 1.8 at a = 1.8. By the end of the run y = 2.1, which is much
+                         steeper than the observed galaxy function. Power law fits to £
+                         over the range 30 > £ > 0.3 are given in Table 2 for all three of
+                         our ensembles. In Figure 4a the growth of £(r) on large scale
+                         matches the linear expectation, £ oc a2, while on small scale
+                         [log (r/L) = —2.5], £ is growing as a2 2. This reflects the accel-
+                         erated growth seen also in the power spectrum. As we discuss
+                         in the next section, the nonlinear clustering in these models
+                         does not match the predictions of earlier similarity arguments
+                         (Peebles 1974,1980; Davis and Peebles 1977).
+                            Two-point correlation functions for the open models are
+                         shown in Figure 4b and are compared with those of EdSl-5 at
+                                                     TABLE 2
+                                  Power-Law Fits to Ç{r) over the Range 0.3 < £ < 30                            Fig. 5.—A test of boundary and discreteness effects. The points show £
+                                                   A. EdSl-EdS5                                             averaged over the ensemble EdS6-8 at various values      of the expansion vari-
+                                                                                                            able. The box length in these models is L = 65h~2 Mpc. The correlation
+                                                                                                            functions for the ensemble EdSl-5 at corresponding linear fluctuation ampli-
+                                       a        A           y           log (r0/L)                          tudes are shown as solid lines. These have been shifted by a factor of 2 to the
+                                1.4.           1.4     1.70 ± 0.01     -1.55 + 0.01                         left to enable a direct comparison with the points. Note the excellent agree-
+                                1.8.           1.8     1.84 ± 0.01     -1.41 +0.01                          ment at late times and the size of the error bars (these are often smaller than
+                                2.4.           2.4     1.96 + 0.02     -1.29 + 0.02                         the symbols plotted).
+                                3.0.           3.0     2.09 ± 0.02     -1.19 + 0.02
+                                4.0.           4.0     2.14 + 0.04     -1.06 + 0.03
+                                                                                                              times chosen to have the same linear growth from the initial
+                                                       B. EdS6-EdS8                                           conditions. The correlations in the EdS models have been
+                                                                        log (r0/L)                            multiplied by 0.9 to account in the mean for the slight differ-
+                                                                                                              ence in the initial power spectra discussed in § II. As we found
+                                1.3.           1.8     1.65 ± 0.01     -1.76 + 0.01                           in earlier work (Frenk, White, and Davis 1983), the correlation
+                                1.7.           2.4     2.02 ± 0.01     -1.60 + 0.02                           functions agree well when times are matched in this way. For
+                                2.1.           3.0     2.14 ± 0.02     -1.50 + 0.02
+                                2.4.           3.5     2.17 ± 0.03     -1.43 + 0.03                           the open and positive A models, £ is somewhat larger on small
+                                2.8.           4.0     2.21 ± 0.03     -1.37 + 0.03                           scales, and smaller on intermediate scales, than in the flat
+                                                                                                              models, consistent with the excess power seen at high fre-
+                                                       C. “Galaxies’                                          quencies in Figure 2b. As Q becomes small this disagreement
+                                       a        A           y            log (r0/L)                           becomes worse ; £(r) steepens on small scales but stops growing
+                                                                                                              at large scale. At late times its shape is not well fit by a single
+                                1.4                                                            1.4    1.96 + 0.04
+                                                                                                              power -1.17    + 0.04
+                                                                                                                       law, so  that the exponents given in Table 2D must be
+                                1.8            1.8     1.99 + 0.05     -1.13 + 0.04
+                                2.4                                                         2.4               treated
+                                                                                                      1.92 ± 0.05     -1.07 ± 0.04 caution.
+                                                                                                                        with some
+                                3.0            3.0     2.09 ± 0.07     -1.01 ± 0.05                               Figure 5 compares the two-point functions of our two
+                                                                                                              ensembles with Q = 1 and boxes of differing size. The lines
+                                                         D. 01-04                                             representing our “standard” models (EdS 1-5) have been
+                                       a        A           y            log (r0/L)        Q                  shifted to the left by a factor of 2 to account for the difference in
+                                                                                                              box size, and the times plotted were chosen so that the linear
+                                1.4            1.2     1.52 + 0.01     -1.72 + 0.02       0.37                fluctuation amplitudes on large scale should match. Once
+                                1.8            1.4     1.73 + 0.01     -1.59 + 0.01       0.31
+                                3.2            1.8     1.82 + 0.02     -1.45 + 0.02       0.20                again we have no freedom to adjust the fit in this diagram; the
+                                5.1            2.1     1.75 + 0.02     -1.39 + 0.03       0.14                curves should coincide, as indeed they do once initial transients
+                                8.4...         2.4     1.75 + 0.02     -1.33 + 0.02       0.09                have had time to subside. Slight differences on very small scale
+                                  Note.—A is the amplitude of mass fluctuations in the linear                 show the effect of the larger softening in the “ big box ” models.
+                               regime relative to that in the initial conditions of EdSl-5. The               This test confirms the similar test carried out above for the
+                               quoted errors come from least-squares fits to log [£(r)].                      power spectra and demonstrates that the rapid steepening of
+
+
+
+
+                                       © American Astronomical Society                               Provided by the NASA Astrophysics Data System
+1985ApJ. . .292. .371D
+
+
+                         No. 2, 1985                                      EVOLUTION OF LARGE-SCALE STRUCTURE                                                                               379
+                         <^(r) in the smaller simulations is an intrinsic property of the                         A more direct test of whether the simulations match the
+                         nonlinear clustering process rather than a consequence of their                        observed shape of ^ is illustrated in Figure 6. Here we show the
+                         finite size. (This behavior is expected because of the non-self-                       projected correlation function,
+                         similarity of the initial conditions.) This test also shows that the
+                         statistical properties of the small-scale structure are very                                            w(rp) = Í dy£[(rp2 + >'2)1/2] ,               (3)
+                         similar in models where the particle masses differ by a factor of                                               J- 00
+                         8 and the softening lengths by a factor of 2. Thus, discreteness                       for the D = 1 models at a = 1.8 and for the open models at
+                         and two-body relaxation effects do not seem to be important                            a = 3.2. In evaluating the integral in equation (3), we used the
+                         on the scales which concern us (cf. Fall 1979). Figure 5 suggests                      mean values of log ^ shown in Figures 4a and 4b. Note that the
+                         that we can use periodic boxes of different size to extend our                         results are significantly affected by our force softening to the
+                         dynamic range; however, this technique is of limited use in                            left of the vertical arrow. The filled circles in Figure 6 show
+                         practice, because we can never evolve a simulation beyond the                          observational estimates of w(rp) from the CfA redshift survey
+                         time when the k = 1 modes begin to go nonlinear.                                       (Davis and Peebles 1983, Fig. 2). Our Q = 1 results fit the data
+                            Under the hypothesis that the galaxies are an unbiased                              very well, provided h = 0.22. The open arrows in the figure
+                         tracer of the mass distribution in the universe, we must require                       show how the model function shifts if it is scaled using 7i = 0.3.
+                         {(r) in our models to have the form of the observed galaxy                             Clearly the value of 7i required for agreement at any given
+                         function. In addition, we must scale the models so that its                            model time is determined to about 10%. The major uncer-
+                         amplitude is correct. The correlation length, r0, defined by                           tainty lies in deciding which model times could be consistent
+                         ¿(r0) = 1, is measured to be 5 ± 0.7/i_1 Mpc for the galaxy                            with the observational data. At a = 3.5 the amplitude of w(rp)
+                         distribution (Davis and Peebles 1983). At the time when the                            matches the data if h = 0.47, but its dependence on rp is much
+                         slope of the correlation function in our models has the                                too steep to be acceptable. The amplitude of w(rp) shown for
+                         observed power-law index, y = 1.8, we find r0 — 1.21 h~2 Mpc                           the Q = 0.2 ensemble in Figure 6 corresponds to the choice
+                         for the Q = 1 ensemble (at a = 1.8) and r0 = 5.8/i-2 Mpc for                           h = 1.1. In this case its shape deviates significantly from a
+                         the open ensemble (at a = 3.2, when Q = 0.2). Thus, for consis-                        power law, but the model still represents the CfA data fairly
+                         tency with the observations, h = 0.25 is required if Q = 1 and                         well. A value of Q in the range 0.2 < Q < 1 would clearly
+                         h = 1.1 if Q = 0.2; both these values are outside the range                            produce rough agreement with both the shape and the ampli-
+                         covered by most modern determinations. For acceptable                                  tude of the observed correlation function for any of the cur-
+                         values of h, our models do not simultaneously reproduce the                            rently popular values of h. However, as we now discuss, such
+                         correct shape and the correct amplitude for ^(r). For example,                         models would predict peculiar velocities for galaxies which are
+                         when a = 4 in the EdSl-5 ensemble, we find h = 0.57 and                                considerably larger than those observed.
+                         y = 2.14 (see Table 2A). The uncertainty as to which model
+                         time should be identified with the present is probably sufficient                                          c) Velocity Moments
+                         to allow large, but acceptable, values of h for the open models.                         The relative peculiar velocity distribution of pairs provides
+                         Matching the correlation length of the positive A model to                             another important diagnostic for the simulations. Consider the
+                         observation when Q = 0.2 also leads to h = 1.1, but in this case                       moments of this distribution as a function of pair separation.
+                         the age of the universe is 2.3 times the usual Einstein-de Sitter                      The first moment points along the separation vector of the
+                         value,                                                                                 pairs and must cancel the Hubble flow if the pairs are to
+
+
+
+
+                            Fig. 6.—The projected correlation function w{rp) (eq. [3]). The filled circles show the results from the CfA redshift survey (Davis and Peebles 1983, Fig. 2), while
+                         the curves show results from our open and Einstein-de Sitter ensembles at a = 3.2 and u = 1.8 respectively. The vertical arrow marks the softening length of our
+                         simulations, and the diagonal arrows show how the results for a flat universe would change if they were scaled using h = 0.3 rather than h = 0.22.
+
+
+
+
+                                       © American Astronomical Society • Provided by the NASA Astrophysics Data System
+1985ApJ. . .292. .371D
+
+
+                         380                                                                   DAVIS ET AL.                                                                      Vol. 292
+
+
+
+
+                            Fig. 7.—Velocity moments are shown in (a) for the O = 1 ensemble EdSl-5 at a = 1.8, and in {b) for the open ensemble 01-4 at a-1= 3.2. The   velocities have been
+                         scaled to units in which the 2Hubble
+                                                        1/2
+                                                              velocity across the computational box is unity. A velocity of one thus corresponds to 3250(Üfc) km s - ^ The solid line shows
+                                                                   2 1/2
+                         the Hubble flow v = Hr. <f | > and <f± > are the rms peculiar relative velocities of pairs in the radial and tangential directions respectively. A vertical arrow in
+                         each panel marks the point where Ç = 1.
+
+                         remain, on average, at fixed physical separation. The second                         in the open models. The decrease of the dispersions at the
+                         moments form a symmetric second-rank tensor; its two inde-                           smallest scales [log (r/L) < —2.3] can be at least partly
+                         pendent eigenvalues correspond to the radial and transverse                          ascribed to the softening of the particles.
+                         velocity dispersions. In Figures la and lb we plot these                                In order to test the effects of softening on the velocity dis-
+                         moments as a function of separation for models EdSl-5 (at                            tribution, we ran one simulation with Q = 1 and a severely
+                         a = 1.8) and for models 01-4 (at a = 3.2) respectively; the                          softened force law. The potential was taken to vary logarithmi-
+                         solid line is the Hubble line v = Hr, and arrows mark the                            cally for separations less than L/32 and was further softened to
+                         correlation length r0. As discussed above, £(r) for both ensem-                      approach a constant at separations smaller than L/430. It thus
+                         bles is approximately described by a power law of index                              corresponded approximately to the interaction of truncated
+                         y = 1.8 at these times. Plots similar to Figure 7 have been given                    isothermal spheres. This model developed a correlation func-
+                         by Davis and Peebles (1977) for BBGKY models, and by Efsta-                          tion with a pronounced bend at the outer softening length, and
+                         thiou and Eastwood (1981) for V-body simulations with white                          it had considerably reduced peculiar velocities on small scales.
+                         noise and subrandom initial conditions.                                              However, the qualitative nature of the velocity field remained
+                             Our results are very similar to those of Efstathiou and East-                    unchanged; the dispersions decreased with separation for
+                         wood (1981) but differ substantially from the predictions of the                     log (r/L) > —1.7, and <y2i(r)> exceeded the Hubble flow in the
+                                                                                      r ses
+                         BBGKY similarity solutions. The first moment,                 i                      region where £ æ 1. The velocity field at these separations is
+                         above the Hubble line for £(r) > 1 in both ensembles, and lies                       thus insensitive to the behavior of the interaction law on
+                         well above it for Q = 1, indicating that, on average, pairs on                       smaller scales. This model produced weakly concentrated clus-
+                         these scales are physically moving together. On the smallest                         ters and a correlation function that is quite inconsistent with
+                         scales <y2iW) = —Hr, as expected for stable bound structures.                        observations of galaxies.
+                         The peculiar velocity dispersion tensor is slightly radially                            A useful test that the velocities shown in Figure 7 are not
+                         biased on all scales. (In accord with previous practice the radial                   unduly influenced by the discreteness of our particles (their
+                         dispersion plotted is not a central moment, and so should have                       individual mass exceeds that of an axion by a factor of order
+                         the mean motion subtracted in quadrature when computing                               1080) is to compare them with the velocities found for the “big
+                          the anisotropy.) In our simulations, as in those of Efstathiou                      box” models EdS6-8. If this is done at times later than that
+                          and Eastwood, the dispersions fall substantially with increas-                      plotted in Figure la, good agreement is found over the range
+                          ing separation, whereas the BBGKY solutions rise slowly. This                       0.01 < r/L < 0.3. However, a = 1.8 in EdSl-5 corresponds to
+                          discrepancy is probably the consequence of some of the sim-                         a = \.21 in EdS6-8, and at such an early time transients from
+                          plifying assumptions which Davis and Peebles adopted in                             the initial conditions are still visible in the velocity correlations
+                          order to make the BBGKY equations tractable. The rms veloc-                         of the “ big box ” models ; corresponding effects may be seen in
+                          ity difference drops slightly more rapidly with separation in the                   the two-point functions plotted in Figure 5. The good agree-
+                          open models than in the closed models. This is yet another                          ment at later times confirms that discreteness effects are indeed
+                          reflection of the fact that clusters are relatively more compact                     negligible in our models. This might also be inferred from the
+
+
+
+                                      © American Astronomical Society • Provided by the NASA Astrophysics Data System
+1985ApJ. . .292. .371D
+
+
+                         No. 2, 1985                                    EVOLUTION OF LARGE-SCALE STRUCTURE                                                                               381
+                         fact that the dispersion on all scales in Figure 7 substantially                     Ol if the two models are compared when Q. = 0.2, and so
+                         exceed the Keplerian velocity of a binary. The dispersions must                      agrees no better with observation.
+                         therefore result from virial motions within more massive aggre-
+                         gates.                                                                                              d) Three-Point Correlation Function
+                            To scale our models to physical units we set the Hubble                              We have estimated the three-point correlation function C(rl5
+                         velocity across the correlation length to its observed value of                      r2, r3) for our models. This may be parameterized in terms of
+                         500 km s-1. (As discussed above, this corresponds to an                              the usual “ size ” and “ shape ” parameters defined by
+                         unrealistically small value of h in EdSl-5.) For Q = 1, particles
+                         at small separation are then inferred to be moving with one-                              r = rl , u = fi/fi , r = (r3 - i'2)/r1 , {r^ <r2< r3)
+                         dimensional rms relative velocities up to 1100 km s-1, while                         (cf. Peebles and Groth 1975). Observational estimates from the
+                         velocities up to 550 km s -1 are found in the open ensemble. As                      galaxy distribution show that ( is closely approximated by
+                         we discuss in § IV, values of 200-300 km s_1 are required to fit
+                         observations of galaxies, and the trend of the observed disper-                             C(G, r2, r3) = QMr^ir,) + i(r2)^3) + &,)&,)] ,                       (4)
+                         sions with separation disagrees with that seen in our models.                        where Q is a constant. Groth and Peebles (1977) find
+                         Smaller velocities would be obtained if we considered models                         Q = 1.3 ± 0.2 from an analysis of the angular correlation func-
+                         with lower Q, but the scale discrepancy discussed in the pre-                        tions measured from the Zwicky and Lick catalogues. Efsta-
+                         vious section would then be worse. If one associates the                             thiou and Jedredjewski (1985) have estimated Q directly from
+                         observed galaxy distribution with the mass distribution of the                       the three-dimensional distribution using four independent red-
+                         simulations, then velocities in the Einstein-de Sitter models are                    shift surveys; they find g = 0.8 ± 0.2, consistent with the
+                         clearly much too high to be consistent with observation. This                        Groth and Peebles’ result. In our models C obeys the scaling
+                         disagreement is exacerbated if the present is identified with a                      with u and v implied by equation (4) very well. In Figure 8, we
+                         larger expansion factor in EdS 1-5 (the correlation amplitude of                     therefore plot Q, averaged over u and v, against the size par-
+                         galaxies could then be matched for a larger value of h). It just                     ameter r for EdS 1-5 and 01-4. In each case, the value of Q on
+                         reflects the well-known fact that the mass-to-light ratios                           small scales is significantly higher than that observed, and
+                         obtained from dynamical analyses of groups and clusters of                           declines to g ä 1 where ( ä 1. Thus the scale dependence of £
+                         galaxies are much too small to close the universe. The open                          in the AT-body models disagrees slightly with observation. In
+                         models give acceptable velocities at large separations ( ~ 5/î ~1                    the most extreme cases we find g > 2 on small scales, well
+                          Mpc) but velocities which are still too large on smaller scales.                    outside the observational limits. Note that as the models
+                         The positive A model has very similar velocity correlations to                       evolve, the small-scale values of g decline. This behavior, and
+
+
+
+
+                                              3
+
+
+
+
+                                              2
+
+                                      o
+
+
+
+
+                                              1
+
+
+
+
+                                              0
+                                                                            log (r/L)                                                         log (r/L)
+                            Fig. 8.—The dimensionless amplitude of the three-point correlation function Q (eq. [4]) plotted against the size parameter r. We have averaged Q over u and v
+                         because we find it to be almost independent of the triangle shape parameters. Results for the ensemble EdS 1-5 are given in (a), and for 01-4 in (b). Values of Q for
+                         different expansion factors are plotted using different symbols as labeled in each panel. Arrows mark the softening length of our simulations.
+
+
+
+
+                                      © American Astronomical Society • Provided by the NASA Astrophysics Data System
+1985ApJ. . .292. .371D
+
+
+                         382                                                                        DAVIS ET AL.
+                         the high initial values of Q, reflect the shape of the initial                            and relatively regular structure. If the points had a fractal dis-
+                         fluctuation spectrum. In the hierarchical model of equation (4),                          tribution, the shape of groups would be independent of b, so
+                         Q provides a measure of the dispersion in the number of neigh-                            this behavior demonstrates a departure from spatial self-
+                         bors found within a sphere of radius r centered on a randomly                             similarity in our models ; further work will be required to deter-
+                         chosen particle. This dispersion is large compared to the mean                            mine whether this is real or is a consequence of our force
+                         number of neighbors if the initial fluctuation spectrum has                               softening on small scales (b = 0.25 corresponds to a separation
+                         considerable power on large scales (cf. the discussion of the                             of l.lrj in our models). Nevertheless it is interesting that the
+                         multiplicity function below). Thus we expect Q to be larger in                            distribution of nearby galaxies appears to show a similar
+                         these models than the value Q— 1.2 ± 0.1 found by Efstathiou                              behavior (Einasto et al. 1984).
+                         and Eastwood for simulations with white noise initial condi-                                 In Figure 9 we plot the multiplicity functions for our ensem-
+                         tions. Similarly, the gradual decrease in the value of Q with                             ble of Einstein-de Sitter models at two times and for b = 0.5
+                         time is probably a result of the non-power-law initial condi-                             and 0.25. We have followed White and Negroponte (1982) and
+                         tions in our models. It is worth mentioning that Fry (1984)                               Einasto et al. (1984) in plotting the number of particles as a
+                         finds a dependence of Q on primordial spectral index n that is                            function of the multiplicity of the group to which they belong;
+                         qualitatively similar to the results found here. Fry’s calculation                        we have also chosen logarithmic bins such that the first con-
+                         is based on second-order perturbation theory, and is not,                                 tains singles, the second pairs, the third triplets and quadru-
+                         however, directly applicable to the regime C > 1.                                         ples, the fourth quintuples to óctuples, etc. The most striking
+                                                                                                                   aspect of the distributions in Figure 9 is that as the simulations
+                                             e) Multiplicity Functions                                             evolve they become flat over the entire multiplicity range
+                            Correlation studies of structure in our models may be com-                             2-1000; a particle is thus equally likely to find itself in a group
+                         plemented by an analysis of the distribution of cluster masses.                           in each logarithmic mass interval over this range. Multiplicity
+                         This distribution, often known as the multiplicity function, is                           functions for our ensemble of open models resemble those
+                         heavily influenced by correlations of very high order which                               shown in Figure 9; these seem to be characteristic of CDM
+                         cannot be estimated directly. We have found groups in our                                 models. Evolution from initial conditions with a large coher-
+                         simulations by linking all particle pairs separated by less than a                        ence length leads to U-shaped distributions in which particles
+                         fraction b of the mean interparticle separation; each distinct                            are likely either to be singles or members of very large clusters.
+                         subset of connected particles is then defined as a group. This                            This may be seen clearly in the diagrams shown by Einasto et
+                         method of cluster analysis has several advantages. In the first                           al. (1984) for models of a neutrino-dominated universe, and we
+                         place it produces a unique group catalog for any chosen value                             have found similar results for the neutrino models of White,
+                         of b. Second, these catalogs obey a nesting condition ; all the                           Frenk, and Davis (1983). Scale-free initial conditions with less
+                         members of any group defined for one particular b are also                                power on large scales (e.g., white-noise models) produce con-
+                         members of the same group in any catalog defined by a larger b                            figurations in which most particles tend to be in systems of
+                         (cf. Efstathiou, Fall, and Hogan 1979). Finally, the method                               intermediate multiplicity; they look rather like the non-
+                         makes no a priori assumption about the shapes of groups. We                               dynamical hierarchical models illustrated by Einasto et al.
+                         have found that if relatively large values of b are used (b » 0.5),                       Thus, as emphasized by Bhavsar, Gott, and Aarseth (1981),
+                         the resulting groups are often quite irregular with several                               multiplicity functions seem to discriminate clearly between dif-
+                         separate centers of concentration. Smaller values of b                                    ferent kinds of linear initial condition. The flat multiplicity
+                         (b < 0.25) tend to pick out objects with a well-defined center                            functions of Figure 9 are very similar to the histograms
+
+
+
+
+                            Fig. 9.—The number of particles in ensemble EdSl-5 in groups of a given multiplicity is plotted as a function of that multiplicity. The multiplicity parameter is
+                         defined to be the integral part of log2 (Ng) + 1, where Ng is the number of particles in a group. It is thus equal to 1 for singles, to 2 for pairs, to 3 for triplets and
+                         quadruples, and so on. Results are shown for a = 1.8 in (a) and for a = 3.0 in (b). In both plots filled squares give results for b = 0.25 and stars give results for b = 0.5,
+                         where b is the maximum separation at which particles are linked into a group; b is expressed in units of the mean interparticle separation.
+
+
+
+
+                                       © American Astronomical Society • Provided by the NASA Astrophysics Data System
+1985ApJ. . .292. .371D
+
+
+                                                                                              •-o-S
+
+                                                                                                       <u
+                                                                                              5
+                                                                                              171
+                                                                                              I|1
+                                                                                              a E u
+
+                                                                                               2 e
+                                                                                                =
+                                                                                                2^^
+                                                                                                o^ bû 335
+                                                                                               •3 -o ^
+                                                                                                 e 77 <u 3^
+                                                                                               "0D<u 3-
+                                                                                                     -r: os
+                                                                                               ’S> Í3SCX <U
+                                                                                                 o u o
+                                                              2
+                                                                                               •S S'Z
+                                                               0                                 g> C3 ^
+                                                                                               sSt o
+                                                                                          •7 E-S
+                                                                                              ' (U C
+                                                                                          g-S'S
+                                                                                          w 'E 2
+                                                                                          x> 3 D
+                                                                                           S« §ö Î3
+                                                                                  C\2'      tnü • 1-H
+                                                                                                §3
+                                                                                       ÖD tJ    0Û c3
+                                                                                       O .S -22 Er
+                                                                                          O X3 Æ
+                                                                                              H §^.
+
+
+
+
+                                                                                                               caution because they are affected by the artificial force softening in our calculations.
+                                                                                                <u Ö
+                                                                                          •S 3S 3o
+                                                                                            öü
+                                                                                  lO         3 5 -c
+                                                                                           3PO.o^cg 0)^
+                                                                                             ’S S3 .s
+                                                                                              o e ôû
+                                                                                I            ‘^•i ^
+                                                         (X)§°i                               Eut)
+                                                                                              <U X ij
+                                                                                             Æ^ O
+                                                                                              S.S
+                                                                                               w J3 U
+                                                                                              sf *r
+                                                                                             O >>, 73C
+                                                                                               e03 g ^-
+                                                                                                      <u
+                                                                                                <L)t ^c ^<nO
+                                                                                                2C <U& ^U-
+                                                                                  C\2 "      45 sC —ci
+                                                                                                 ^ S 73
+                                                                                                 co *35 O
+                                                                                        ttf) CX ° ^
+                                                                                        o S B S
+                                                                                                 bû U S
+                                                                                                 °.i s
+                                                                                              £ S»
+                                                                                                 <Ua ^K 3
+                                                                                  lO             2
+                                                                                              °r ^ §
+                                                                                                   i. s-«
+                                                                                              ° -^ ci
+                                                                                              “o Sg o.   E
+                                                                                              r, ^3 3
+                                                     (9)8oi
+
+
+
+
+                         © American Astronomical Society • Provided by the NASA Astrophysics Data System
+1985ApJ. . .292. .371D
+
+
+                         384                                                          DAVIS ET AL.                                                         Vol. 292
+
+                         obtained for the nearby galaxy distribution by Einasto et al for       percolation occurs. Einasto et al. (1984) suggest this to be a
+                         corresponding values of b. We hope to come back to this ques-          useful measure of structure both in AT-body models and in data
+                         tion and make a detailed comparison with a larger sample of            catalogs; Dekel and West (1985), on the other hand, point out
+                         observational data in a later paper.                                   a number of difficulties in interpreting percolation properties.
+                            The groups in our simulations correspond to the bound               Models EdSl-5 percolate for values of b in the neighborhood
+                         clumps of cold dark matter which must make up the halos of             of 0.7, both at a = 1.8 and at a = 3. Percolation is slightly
+                         individual galaxies and of groups and clusters of galaxies in the      harder at the later time and is also slightly harder in the open
+                         real universe. For small values of b our group-finding algo-           ensemble. This value of b is smaller than the value b = 0.86
+                         rithm picks out single, well-defined clumps that can be identi-        required for percolation in a three-dimensional Poisson dis-
+                         fied with such structures. Although we do not have space here          tribution. Thus by the criteria of Einasto et al. the present
+                         to present a thorough discussion of clump properties, we show          models appear filamentary rather than hierarchical, even
+                         some results in Figure 10 to give an idea of what is possible.         though Figure 1 shows that clusters do grow in a hierarchical
+                         For each group found by our algorithm we calculated a mass             fashion. For the nearby galaxy distribution Einasto et al. found
+                         mg, an inertia tensor with principal components nigü^2 >               percolation to occur for b = 0.65, quite close to the value we
+                         mga22 > mga32, an internal velocity dispersion <t»2), and an           obtain for our models.
+                         angular momentum vector J. From these quantities we derive a
+                         mean density, two shape parameters, and a spin parameter                                      /) Counts in Cells
+                         using the formulae :                                                      Further information about galaxy clustering is contained in
+                                                                                                the distribution of counts in cells, and, in particular, in its
+                                             p = 3mg/(4n53l2a1a2 a3) ,
+                                                                                                departure from a Gaussian curve. For the AT-body simulations
+                                             e
+                                              i = ailai ?                                       this statistic is very easy to generate, but for the data it is
+                                                                                                essential to use volume-limited catalogs; this reduces the size of
+                                             ¿2 = “i/ai »                                       available surveys and makes comparison quite difficult. Figure
+                                                = J((v2y/2)1,2/Gmg2 .                     (5)   11 shows the distribution of counts in cubes of side L/8 and L/4
+                                                                                                for EdSl-5 at a = 1.8. At this epoch r0/L = 1/26, so these
+                         In these equations p is the density of a uniform ellipsoid with        cubes should be compared with regions of the real universe
+                         the same mass and inertia tensor as the group, and A' differs          which are 16/i-1 and 32h~1 Mpc on a side. For the smaller
+                         from the usual spin parameter in that it is defined using the          cube the distribution is extremely non-Gaussian; there are an
+                         kinetic energy of the group rather than its total energy. For an       extended tail at high density and an excess of low density
+                         oblate system ^ = 1, while for a prolate system e2 = 1. Figure         regions. For the larger cube the distribution is much closer to a
+                         10 shows the distribution of some of these quantities for the          Gaussian, but even here the departures are quite substantial.
+                         273 groups with 30 or more members in models EdSl-5 at                 The expected rms fluctuation in the number in a cube is
+                         a = 1.8. We give p in units of the mean density of the calcu-          (ôp/p)rms = Ç112, where ^ is the average of the correlation func-
+                         lation and mg in units of the particle mass. For the value             tion over the cube. From our cell counts we find rms fluctua-
+                         b = 0.25 used here, the algorithm clearly picks out groups at a        tions of 70% and 35% for the small and large cubes
+                         fairly well-defined density contrast of about 200. There is no         respectively.
+                         correlation of density with mass except for a slight tendency for         The dashed histogram in Figure 11 corresponds to the dis-
+                         the very largest groups to have low density. The spin par-             tribution of counts in cells of redshift space for cubes of side
+                         ameter also shows at most a very slight anticorrelation with           L/4. This curve was generated by displacing each particle in the
+                         mass, and has a median value of about 0.045. The lack of trend         z-direction by its z-component of peculiar velocity divided by
+                         agrees with the results of Efstathiou and Barnes (1983) for            the model Hubble constant and then using the same algorithm
+                         simulations from white noise initial conditions, but our charac-       as before; this procedure approximates the construction of a
+                         teristic value is 30% lower. This difference would be interesting      volume-limited redshift catalog, the z-axis being the redshift
+                         if correct, but it is almost certainly due to the effects of soften-   direction. Observational catalogs of large-scale clusters and
+                         ing in the present calculations; the mean separation of particles      holes are, of course, measured in redshift space, not real space,
+                         in our groups is approximately equal to rj. The problem merits         and should be compared to this histogram. The difference
+                         further careful investigation using higher resolution simula-          between the redshift-space and the real-space histograms is
+                         tions. The groups tend to be quite strongly aspherical; axial          seen mainly in the low-density cells. Because of the coherent
+                         ratios greater than 2 are quite common. Their generic shape is         outflowing of material from low-density regions, cells tend to
+                         neither oblate nor prolate, although a clear majority of groups        appear emptier in redshift space than in real space. This effect
+                         have e2> eu showing some preference for a prolate figure.              can be substantial, particularly in a high-density universe.
+                         Again this merits further study to investigate the influence of           From the cumulative distribution corresponding to Figure
+                         tides, of internal substructure, and of force-softening on the          11, we find that 4% of cubes of side L/4 have n/ñ < 0.5 in real
+                         measured quantities. We have found very similar distributions          space, versus 8% in redshift space. However, even in redshift
+                         for a = 3 in models EdSl-5, the main difference being that the         space, the fraction of very empty cubes is very small; only 0.6%
+                         mass distribution then extends to higher masses (see Fig. 9).          of cubes of side L/4 have n/h <0.3. A very similar result is
+                         The properties of groups in our open models are very similar to        found in models EdS6-8, if we analyze them at ö = 1.3 when
+                         those shown in Figure 10, but since these groups are rather            the correlations are similar to those of EdSl-5 at a = 1.8. In
+                         more compact, they are even more strongly affected by force            these models, 10% of 32/z“1 Mpc cubes in redshift space have
+                         softening.                                                             density less than half the mean. In the open models, the dis-
+                            A final problem which we have addressed with our group-             tribution of counts in large cells is virtually identical to that for
+                         finding algorithm is the derivation of the value of b for which        the Q = 1 models, provided times with the same linear growth
+                         linked structures extend across our computational volume and           factor are compared. At late times, linear fluctuations cease to
+
+
+
+
+                                    © American Astronomical Society • Provided by the NASA Astrophysics Data System
+1985ApJ. . .292. .371D
+
+
+                         No. 2, 1985                                     EVOLUTION OF LARGE-SCALE STRUCTURE                                                                                385
+
+
+
+
+                             Fig. 11.—Histograms of counts in cells for the ensemble EdSl-5. The distribution of counts in cubes of side one-eighth that of the simulation volume is shown in
+                         (a), while {b) shows the corresponding distribution for cubes of side one-quarter that of the box. The dashed histogram in (b) shows the result of making the counts in
+                         “ redshift ” space rather than in real space.
+
+                         grow in an open universe, and large holes would no longer                             we have found so far, we now compare some of them with the
+                         expand in comoving coordinates.                                                       CfA redshift survey by generating “ redshift ” catalogs follow-
+                            It is difficult to find observational data to compare with                         ing the procedure of Davis et al. (1982). We situate the observer
+                         these results. In a subset of the CfA redshift survey (Davis et al.                   within the computational box and choose points at random in
+                         1982; Huchra et al. 1983) volume-limited to 6000 km s“1 and                           such a way as to mimic the selection function appropriate to
+                         magnitude-limited to 7500 km s-1, an analysis of counts in                            the CfA northern catalog, when it is volume-limited to a dis-
+                         randomly placed spheres suggests that 20% of spheres of                               tance of 4000 km s-1, and magnitude-limited at mz — 14.5
+                         radius 20/i-1 Mpc (i.e., with the same volume as a 32/i_1 Mpc                         from 4000 km s_1 to 10,000 km s-1. Further details are given
+                         cube) have density less than half the mean. There is thus a                           by Davis and Huchra (1982). We recall that y = 1.8 at a = 3.2
+                         discrepancy with the CDM prediction by about a factor of 2.                           in 01-4, and that setting the model correlation length to its
+                         Note, however, that the total volume of the survey is less than                       observed value then requires h = 1.07 and a physical box size
+                         that of eight such spheres, so that the statistics are very poor.                     of 142 Mpc.
+                         Nevertheless the number and sizes of voids within the CfA data                           Redshift catalogs constructed in this way from runs 02 and
+                         set appears to be quite representative (cf. Oort 1983). If really                     03 (at a = 3.2) and projected onto the sky are shown in
+                         large voids in the galaxy distribution such as the 30h~1 Mpc                          Figures 12a and 12b. The semi-volume-limited CfA northern
+                         radius void in Bootes reported by Kirshner et al. (1981, 1983)                        catalog, which these samples model, is shown in Figure 12c. To
+                         turn out to be common, they may be difficult to explain within                        illustrate the kind of fluctuation which may be expected, we
+                         a CDM model. The Bootes region has not been fully surveyed,                           have situated the origin near a prominent cluster in model 03,
+                         but Kirshner et al. claim the density of bright galaxies there to                     in much the same way as we happen to be near the Virgo
+                         be less than 25% of the mean. This is particularly startling                          supercluster. The selection criteria were unchanged between
+                         because the volume of the void is about 10% of all space that                         models 02 and 03, so this procedure results in the number of
+                         has been fully surveyed to date! Within our simulations we see                        selected “galaxies” being considerably higher in 03. Wedge
+                         no low-density regions of this size despite the fact that the total                   diagrams of these three catalogs are shown in Figures 13a-c.
+                         simulation “volume” (in units of r03) is greater than the                             The simulation data have been plotted in redshift space, which
+                         volume of “ known ” space.                                                            includes the peculiar velocity distortion in the radial direction ;
+                                                                                                               the rms value of this velocity is 256 km s~1 for the catalog from
+                                   IV. COMPARISON WITH A REDSHIFT CATALOG                                      02 and 357 km s-1 for that from 03. A comparison of these
+                            In the previous section, we showed that CDM models with                            three catalogs is quite instructive. “Fingers of God” can be
+                         Q = 1 give excessively high velocities and two- and three-point                       seen in all three samples, as can long filamentary structures.
+                         correlation functions incompatible with observation. The                              The cluster we chose in 03 is clearly richer than Virgo, and
+                         amplitudes of the relative peculiar velocities, and of <^, are                        there is as much difference between the two simulated catalogs
+                         better reproduced in models with Q » 0.2, but the discrepancy                         as between them and the real data. The large-scale power in the
+                         in the value of Q is worse. Since these open models (at a ä 3.2)                      perturbation spectrum produces significant fluctuations in
+                         are the best approximation to the observed galaxy distribution                        volumes the size of the CfA catalog, so that it is difficult to
+
+
+
+
+                                      © American Astronomical Society • Provided by the NASA Astrophysics Data System
+                                                                                                                                                                              1985ApJ. . .292. .371D
+
+
+
+
+  Fig. 12.—Redshift catalogs constructed from two open models (02 and 03) are shown in {a) and {b) as projections onto the “ sky.” Particles were selected for inclusion in these catalogs in such a
+way as to mimic the northern CfA survey. The real data are shown in the same format in (c). These are equal area plots of the sky; the outer circle corresponds to Galactic latitude +40°, while the
+empty regions correspond to declinations below 0°. In constructing the catalog from 03 shown in (b), the “ observer ” was purposely sited near a prominent cluster.
+1985ApJ. . .292. .371D
+
+
+
+
+                                                                                                            (c)
+                            Fig. 13.—Wedge diagrams for the three         catalogs illustrated in Fig. 12. The radial coordinate in these plots is recession velocity with successive circles
+                         corresponding to increments of 1000 km s-1. The angular coordinate is right ascension with a line plotted for each hour. All “galaxies” in the declination range
+                         0° < <5 < 45° are shown, with squares corresponding to 0° < <5 < 15°, stars to 15° < <5 < 30°, and crosses to 30° < <5 < 45°. The three slices of this pie are labeled to
+                         correspond to Fig. 12. Note the large cluster in 03 and the Virgo Cluster in the CfA data.
+
+
+
+
+                                                                                                           387
+
+
+
+
+                                      © American Astronomical Society                                 Provided by the NASA Astrophysics Data System
+1985ApJ. . .292. .371D
+
+
+                         388                                                                      DAVIS ET AL.                                                                          Vol. 292
+
+                         judge the acceptability of a model on the basis of one rep-                             the foreground cluster in this catalog “beats” against a large
+                         resentation. Such fluctuations also affect the observations, as                         low-density region just behind it (cf. Fig. 13b); this beating
+                         may be seen by comparing galaxy distributions in the northern                           produces most of the anticorrelation seen on intermediate
+                         and southern hemispheres out to a distance of 50/i-1 Mpc.                               scales. One should clearly be cautious when interpreting
+                          Figures 12 and 13 give the overall impression that our open                            reports of anticlustering in redshift surveys (Davis and Peebles
+                         models match the observed galaxy distribution very well.                                 1983; Shanks et al. 1983).
+                             We produced the redshift catalogs for 02 and 03 by scaling                              The distribution of peculiar velocities provides the most
+                          the simulations so that the two-point correlation function of                           stringent observational test of our models. In redshift surveys
+                          the open ensemble matches that of the observations. However,                            one can study i(rp, Ar), the two-point correlation of pairs as a
+                          since the redshift catalogs contain only 3%-4% of the original                         function of their projected separation rp and their line-of-sight
+                          particles, we can expect substantial fluctuations in estimates of                       velocity difference Av. The rms distortion of Ç in the v direction
+                          Ç(r) derived from them. In Figure 14 we plot £(r) computed                              as a function of rp is termed cr(rp); its square is a linear com-
+                          from the three redshift catalogs in a fashion that attempts to                          bination of the radial and transverse components of <i>2i2>>
+                          give equal weight to each volume element; this was the method                           suitably averaged over projection factors. There is excellent
+                          used by Davis and Peebles (1983) for the CfA data. We give {                            agreement between the estimates of a(rp) from the CfA and
+                          as a function of the apparent spatial separation in redshift                            AAT redshift surveys (Davis and Peebles 1983; Bean et al.
+                          space; this is a biased estimator of the true ^(r). The catalog                         1983). Both groups report the velocity field to be smooth; the
+                          from 03 has correlations quite similar to the CfA data, but that                        CfA data are best fit by a slowly rising cr(rp), while the AAT
+                          from 02 has a smaller correlation length. Since the models                              data are consistent with this, but are better fit by a constant
+                          have larger peculiar velocities on small scale than the real data                               We have applied the procedure of Davis and Peebles
+                          (Fig. lb), their correlation function in redshift space is shal-                        (1983) to our artificial “redshift” catalogs, and the results are
+                          lower than that observed. This effect is evident in the 03 catalog                      plotted in Figure 15. The error bars are formal errors from fits
+                          for r < 5/z-1 Mpc. Note also that the CfA data become nega-                             to an exponential broadening function, which represents both
+                          tive for r > 28/i"1 Mpc, that the same is true for the 03 catalog                       the CfA data and the models quite well. The/parameter used
+                          at r > 20/z-1, but that the 02 catalog is positive on almost all                        by Davis and Peebles is here set to unity, which agrees with
+                          scales. The true £(r) is actually positive over all these scales in                     <i;2i(r)> as plotted in Figure lb. It was to be expected from the
+                          models 02 and 03. The negative correlation seen in the 03                               behavior of the full peculiar velocity-dispersion tensor that
+                          redshift catalog, and perhaps also that in the CfA data, results                        cr(rp) would fall with radius; Figure 15 demonstrates that it is
+                          from the substantial inhomogeneity of these data sets and from                          indeed possible to see this trend in a redshift catalog, and that
+                           the method of estimation. In the analysis of redshift catalogs,                        it is inconsistent with the CfA and AAT data. We showed in §
+                           one solves for the mean density ñ, as well as for ^(r). Despite the                    IIIc that the falling dispersions of our models are not a conse-
+                           use of a density estimator that is minimally biased by inhomo-                         quence of their experimental limitations; they must therefore
+                           geneity effects (see Davis and Huchra 1982 for details), the                           be considered a serious disagreement with observation. The
+                           derived ñ for the 03 catalog is slightly higher than the true                          substantial difference between <j(rp) in the two simulations is
+                           mean; this reduces the correlations on large scale. In addition,                       caused by the large cluster in the foreground of the 03 catalog.
+
+
+
+
+                            Fig. 14.—Correlation functions calculated in redshift space for the three catalogs of Fig. 12. Note that r is not a true physical distance in this plot since it includes
+                         distortions caused by peculiar velocities. The scaling of the simulations assumes h = 1.1, the value required to get <^(r) for the ensemble of open models to match
+                         observation (see Fig. 6).
+
+
+
+
+                                      © American Astronomical Society • Provided by the NASA Astrophysics Data System
+1985ApJ. . .292. .371D
+
+
+                         No. 2, 1985                                     EVOLUTION OF LARGE-SCALE STRUCTURE                                                                               389
+
+
+
+
+                            Fig. 15.—The rms line-of-sight peculiar relative velocity as a function of projected separation for catalogs made from 02 {open squares), from 03 {open triangles),
+                         from the CfA redshift survey {filled squares; from Davis and Peebles 1983), and from the “galaxies” found in EdSl-5 by the algorithm described in § V. The two
+                         open models have been scaled using h = 1.1, while the biased formation ensemble has been scaled using h = 0.44.
+
+                         The velocity moments are computed on a pair-weighted basis,                           cation procedure involves two parameters, the dispersion rs of
+                         and the presence of this cluster skews the results. This effect is                    the Gaussian filter exp ( — r2/2rs2) used to smooth the density
+                         undoubtedly larger in the 03 catalog than in the real data,                           field, and the threshold v. The scale parameter defines the size
+                         because of the richness of the cluster we chose to sit next to.                       of the regions from which a galaxy forms, while the threshold is
+                           We have found that no CDM model is in complete agree-                               some measure of the “ difficulty ” of galaxy formation. Because
+                         ment with observation if galaxies are distributed in the same                         there is so much power on large scales in the CDM models, it is
+                         way as the mass ; the open models are a better fit than models                        significantly more probable for a local peak to rise above a
+                         with Q = 1, but are still not fully acceptable. To try and cir-                       fixed threshold if it lies in an incipient protocluster than if it lies
+                         cumvent these problems, we now explore the effect of relaxing                         in an incipient void. As a result our “galaxies” are a biased
+                         the assumption that galaxies trace the mass. This is clearly                          subset and are more strongly clustered than the simulation as a
+                         necessary if we wish to find a viable model with Q = 1.                               whole. We find the strength of this bias to increase strongly
+                                                                                                               with v, but only rather weakly with rs; the number of particles
+                                           V. BIASED GALAXY FORMATION                                          tagged as galaxies depends strongly on both parameters. A
+                            In a universe dominated by CDM, galaxy formation pre-                              similar effect has recently been explored by Kaiser (1984a) as a
+                         sumably occurs at peaks of the matter-density field. Now                              possible explanation for the large correlation length of the
+                         suppose that galaxy formation is a process that can go to                             distribution of rich galaxy clusters. Analytic discussions of
+                         completion only under favorable circumstances and can be                              biasing in the present context are given by Bardeen (1984) and
+                         suppressed if the environment changes. This might occur, for                          Kaiser (1984b). With rs = L/192 and v = 2.5, we obtain about
+                         example, if the first generation of stars photoionizes, or shock                      1000 tagged points, or about 3% of the original. After adopting
+                         heats to high temperature, those regions that were somewhat                           a suitable scaling, this turns out to be comparable to, or some-
+                         slower to collapse, cool, and fragment. It is then reasonable to                      what less than, the expected number of bright galaxies in a
+                         expect that the highest peaks (which have the shortest cooling                        volume the size of our box (i.e., to a density ~ 0.003b3 Mpc-3).
+                         and collapse times) will be the most likely to complete the                              The result of applying this procedure to run EdSl is illus-
+                         process of galaxy formation successfully. A similar biasing of                        trated in Figure 16, which compares the distribution of
+                         the bright-galaxy distribution might occur if the stellar initial                     “galaxies” with that of the dark matter at a = 1.4. The
+                         mass function is sensitive to local environment, or perhaps                           “galaxies” follow the clustering structure of the underlying
+                         simply if galaxy formation is sufficiently sensitive to protoga-                      matter field but with greatly enhanced amplitude. The effect of
+                         lactic cooling time.                                                                  this bias on ^(r) is shown in Figure 17a, where we plot the
+                            To simulate this kind of situation, we applied a low-pass                          evolution of the “galaxy” correlation function in models
+                         filter to the initial random-density field of our models and                          EdSl-5 and compare it with the unbiased results obtained
+                         tabulated the result on a 643 grid. We then identified all peaks                      when all particles are used; power-law fits to these correlation
+                         of amplitude at least v times the rms density fluctuation and                         functions are given in Table 2C. The “galaxy” correlations
+                         tagged the particle whose Lagrangian position lay nearest each                        substantially exceed the mass correlations on all scales, but the
+                         one as a “galaxy.” Only one “galaxy” was allowed for each                             effect is most marked at small separations and produces an
+                         connected region above the threshold. The tagged particles                            increase in the effective power-law index y. Much of the clus-
+                         were followed over the course of the simulation. This identifi-                       tering of the “ galaxies ” is due to the pattern imposed by the
+
+
+
+
+                                      © American Astronomical Society • Provided by the NASA Astrophysics Data System
+1985ApJ. . .292. .371D
+
+
+
+
+                         © American Astronomical Society   Provided by the NASA Astrophysics Data System
+1985ApJ. . .292. .371D
+
+
+                                                                       EVOLUTION OF LARGE-SCALE STRUCTURE                                                                           391
+
+
+
+                                                                                                                                                                  Q = 1
+                                                                                                                    3 -
+                                                                                                                                                              "Galaxies"
+                                                                                                                              ■ 1.4
+                                                                                                                              * 1.8
+                                                                                                                              • 2.4
+
+
+
+
+                                                                                                                                                    t
+
+                                                                                                                               (b)
+
+                                                                                                                                            J   I       I   _l_
+                                                                                                                                     -2.5                                  -2
+                                                                        log(r/L)                                                                          log (r/L)
+                            Fig. 17.—Correlation properties of “galaxies” in EdSl-5 on the biased galaxy formation model, {a) compares the evolution of <^(r) for the “galaxies” (symbols
+                         with error bars) with that of the mass distribution as a whole (solid lines), (b) shows Q values for the “ galaxies ” in the same format as Fig. 8.
+
+                         statistical properties of the linear density field rather than to                  found to lead to the values of <j(rp) shown in Figure 15, which
+                         the effects of gravity. This is particularly evident on large                      are in as good agreement with observation as those for
+                         scales, where correlations grow very little until the underlying                   unbiased models with Q = 0.2. The redshift catalogs for our
+                         matter distribution has become significantly clustered. As a                       “ galaxies ” are too sparse for visual comparison with the CfA
+                         result, £(r) for the “ galaxies ” steepens even more rapidly than                  survey (as in Figs. 12 and 13), but we can get some information
+                         for the simulation as a whole. By a = 1.4, our models have an                      about the probability of large low-density regions from the
+                         effective y which exceeds 1.8, and by a = 1.8, the galaxy correl-                  distribution of counts in cells. In EdSl-5, we find only one
+                         ation function is clearly too steep to match observation. The                      cube out of 40 with side 7r0 (35b_ 1 Mpc) to have a density less
+                         correlation length r0 for the “galaxies” exceeds that of the                       than half the mean. Holes appear to be relatively less abundant
+                         underlying mass distribution by a factor of 2.4 at a = 1.4. The                    in these “ galaxy ” samples than in the overall mass distribution
+                         two- and three-point correlations of the “galaxies” obey the                       (cf. § III/). Thus voids as large as the one in Bootes may be
+                         empirical formula of equation (4) at least as well as those of the                 hard to accommodate in our model. Simulations of larger scale
+                         mass, and, as shown in Figure 17b, they imply Q values which                       are required to obtain a definitive answer on this point.
+                         agree better with observation. The relative peculiar velocities                       Although our prescription for galaxy formation is very
+                         of the “ galaxies ” behave in a similar way to those of the simu-                  crude, it is clear that the biases which arise if there is an effec-
+                         lations as a whole; the bias is evident only as a slight increase                  tive threshold for galaxy formation can be very strong. Fur-
+                         in the dispersions. This may be seen in Figure 18, as may the                      thermore, their effects are of the kind required to bring an
+                         fact that the dispersion profiles for the “ galaxies ” are some-                   Einstein-de Sitter CDM universe into agreement with obser-
+                         what flatter than those of Figure 7a.                                              vation. The particular models which we discuss above have
+                            To scale these “galaxy” catalogs to the real world, we again                    two-point correlations and peculiar velocity distributions
+                         set the correlation length r0 to 5b _ 1 Mpc. Unfortunately, while                  which are quite similar to those that we obtained earlier for our
+                         the correlation exponent y is about 1.8 at a = 1.2, the peculiar                   open models. They are more successful than the open models
+                         velocity distribution shows the effects of initial transients until                in reproducing the observed three-point correlations, and they
+                         about a = 1.8. As a compromise we identify the present with                        imply an age for the universe which is not uncomfortably short.
+                         a = 1.4 when ^ is only slightly steeper than the observations                      Furthermore, they satisfy the theoretical desire for a flat uni-
+                         and velocity transients have already subsided to a relatively                      verse without contradicting dynamical studies of galaxy clus-
+                         low level. At this time r0 = 0.07L, leading to a value of 0.44 for                 tering. Finally, they lead to predicted fluctuations in the
+                         h and to a box size L = 168 Mpc. With this scaling the velocity                    microwave background which are far below the current obser-
+                         unit in Figure 18 is 7400 km s-1, and the one-dimensional                          vational upper limits (Bond and Efstathiou 1984; Vittorio and
+                         dispersion has a maximum of 575 km s_1, from which it drops                        Silk 1984). On the negative side, the biased models seem less
+                         to values of order 400 km s-1. When redshift catalogs are                          able to produce large-scale voids than the open models, and
+                         made from the “galaxy” distributions, these dispersions are                        they predict that galaxies formed at quite recent epochs—this
+
+
+
+
+                                      © American Astronomical Society • Provided by the NASA Astrophysics Data System
+1985ApJ. . .292. .371D
+
+
+                         392                                                                  DAVIS ET AL.                                                                        Vol. 292
+
+
+
+
+                                                                                                        log(r/L)
+                                     Fig. 18.—Moments of the relative peculiar velocity distribution of pairs of“ galaxies ” in EdSl-5 at a = 1.4 in the same format as Fig. 7.
+
+                         may conflict with observation. Clearly, what is now required is                     of simulations, a time interval can be chosen so that Ç provides
+                         a proper physical model for galaxy formation which can be                           an acceptable match to the shape of the observed galaxy two-
+                         grafted onto simulations to see if the distribution of our                          point function over a limited range of scales. The amplitude of
+                         “galaxies” is indeed realistic. These biased galaxy-formation                       the observed function can then be matched by choosing h
+                         models are in many ways the closest we have come to matching                        appropriately. For Einstein-de Sitter models we require
+                         the observed galaxy distribution, and they involve the                              h ä 0.22, which is unacceptably low. On the other hand, for
+                         minimum gravitational interaction !                                                 models in which £ has the right shape when Q = 0.2, we need
+                                                                                                             h ä 1.1; this seems rather high. Our model with zero spatial
+                                                   VI. CONCLUSIONS                                           curvature and positive cosmological constant has very similar
+                                                                                                             properties to open models with the same value of Q; however,
+                            The numerical simulations discussed in this paper were                           it implies a considerably greater age for the universe.
+                         designed to study nonlinear gravitational clustering in a uni-                          3. The peculiar velocity distribution in our simulations does
+                         verse dominated by cold dark matter. We assumed adiabatic                           not give a good match to observations of galaxies. For Q = 1
+                         primordial density fluctuations with a constant-curvature spec-                     we find rms one-dimensional relative peculiar velocities of
+                         trum. We followed the evolution of two ensembles of simula-                         a ä 1000 km s_1 at separations r æ 1/z-1 Mpc, much in excess
+                         tions with Q = 1, another ensemble with Q < 1, and a single                         of the observational estimates, a æ 200-300 km s_1; this is a
+                         simulation of a flat universe with a nonzero cosmological con-                      reflection of the well-known fact that the mass-to-light ratios of
+                         stant. Our main conclusions are as follows :                                        small groups and clusters appear much smaller than that
+                            1. Initial conditions of this kind lead to a very rapid growth                   needed to close the universe. For Q = 0.2 we find a æ 500 km
+                         in the characteristic scale of clustering. As a result, nonlinear                   s_1 on small scales, which is still rather too big. At r ä 5/i_1
+                         structures on a wide range of scales are present at any given                       Mpc, however, peculiar velocities in the open models are quite
+                         moment. This is reflected in the filamentary structures, the                        similar to those observed. In the simulation with a nonzero
+                         superclusters of clumps, and the large low-density regions                          cosmological constant, the peculiar velocity distribution
+                         which are visible in pictures of the particle distribution. This                    resembles that in an open model with the same value of Q. In
+                         large-scale morphology is clearly a very general consequence of                     all the models a is found to decline markedly with increasing
+                         nonlinear evolution from such initial conditions. While its                         pair separation, whereas the observations show it to be con-
+                         scale and its evolution rate depend on Q, A, and h, its form is                     stant, or to increase slightly with scale.
+                         almost independent of them.                                                            4. If we write the irreducible three-point correlation func-
+                            2. The particle two-point correlation function ^(r) steepens                     tion as C = Q£2, we find that, although Q is independent of
+                         with time in all the models, showing that their evolution is not                    triangle shape, it decreases slowly with triangle size in all our
+                         self-similar. The good agreement we find between ensembles of                       models. On scales r < 5/i “1 Mpc, we find values of Q for the
+                         different scale argues strongly that this result is not a conse-                    mass distribution which are considerably greater than those
+                         quence of the limited spatial and temporal resolution of our                        estimated for galaxies. This discrepancy gets smaller as our
+                         experiments, but rather reflects the lack of spatial self-                          models evolve, but it always remains significant.
+                         similarity in the theoretical initial conditions. In each ensemble                      5. The distribution of cluster masses is very broad in our
+
+
+
+
+                                    © American Astronomical Society • Provided by the NASA Astrophysics Data System
+1985ApJ. . .292. .371D
+
+
+                         No. 2, 1985                             EVOLUTION OF LARGE-SCALE STRUCTURE                                                           393
+
+                         models and is quite different from that found either in simula-       we can reproduce not only the correlation functions and other
+                         tions with white-noise initial conditions or in models where the      small-scale statistics of galaxies but also the filaments and
+                         initial density field has a large coherence length. Despite the       voids which characterize their large-scale distribution. Higher
+                         fact that structure grows hierarchically in the present models,       resolution models would also help us to pin down the epoch of
+                         percolation across them is easier than across a Poisson dis-          galaxy formation. This is important because it appears to be
+                         tribution of points ; in this sense our models show filamentary       quite recent, particularly in the biased formation models, and
+                         structure. These properties correspond quite closely to the           so may be in conflict with observation.
+                         results of Einasto et al (1984) for the galaxy distribution in the        Structure forms in a universe dominated by CDM in a well-
+                         neighborhood of the Local Supercluster.                               specified way, and it is worth mentioning several aspects of its
+                             6. The distribution of particle counts in cells is found to       evolution which may be amenable to direct observational
+                         have significantly non-Gaussian tails, even for cubic cells with      testing. The rapid increase in the characteristic scale of clus-
+                         side exceeding 6r0 (where ¿(r0) = 1). 4% of such cubes are            tering might be observable on Mpc scales if Q = 1 and galaxies
+                         underdense by a factor of 2. This frequency doubles if the            trace the mass distribution; however, such models are already
+                         distribution is analyzed in “ redshift space.” The observed fre-      ruled out by the kinematics of nearby galaxies. If the universe is
+                         quency of such large low-density regions is very poorly known         open, or if our biased galaxy formation model is appropriate,
+                         but appears to be about a factor of 2 larger than in our models.      the correlation function is a much weaker function of lookback
+                         None of our simulations contains an underdense region as              time. Existing data on angular correlations of galaxies at
+                         extreme as the apparent void in Bootes.                               z ä 0.3 (Koo and Szalay 1984) may put significant constraints
+                             7. Artificial redshift catalogs of points, chosen from our        on these possibilities. The biased formation model implies that
+                         simulations in a way which mimics the selection of galaxies for       “ failed ” galaxies should be visible in our local region of space.
+                         the CfA redshift survey, show considerable resemblance to the         The voids should contain some baryons either in low-density
+                         real data. These samples also show that substantial fluctua-          gas clouds or in low-surface-brightness galaxies. Space Tele-
+                         tions are to be expected in estimates of clustering statistics        scope will be an excellent tool to search for such clouds. One
+                         derived from samples of this size. In particular it is quite likely   would look for low-redshift Lya absorption clouds in the
+                          that the anticorrelation seen in the CfA survey at separations       spectra of distant QSOs. It is known that the Lya clouds
+                          of order 20h ~1 Mpc is an artifact of the relatively small volume    observed at z = 2 are more weakly clustered than bright gal-
+                          surveyed.                                                            axies (Sargent et al 1980); this may already be evidence for
+                             8. In all the above comparisons with observation, we              biased galaxy formation. At low redshift the distribution of
+                          assume that the distribution of galaxies may be identified with      clouds found by Space Telescope could be correlated with the
+                         the mass distribution in our models. Observed galaxies may,           galaxy distribution measured by redshift surveys; if the clouds
+                         however, be a biased reflection of the real underlying mass           clustered only weakly with galaxies, and lay preferentially in
+                         distribution. We have investigated the kind of bias to be             “voids,” it would be clear evidence that galaxy formation is
+                         expected if bright galaxies form only at relatively high peaks of     biased on large scales.
+                          the linear density distribution. If this is the case, their large-       The distribution of rich clusters of galaxies and of large voids
+                          scale clustering follows that of the dark matter, but with           presumably gives us information about initial fluctuations on
+                          strongly enhanced amplitude. For plausible parameters we find        large scale. The correlation function of Abell clusters can be
+                          that the correlation length of galaxies in the present universe       understood as reflecting the enhanced clustering of rare peaks
+                         may exceed that of the dark matter by a factor of about 2.5.          in the matter distribution if the underlying mass distribution is
+                          The peculiar velocities of galaxies are then smaller than those       positively correlated on the relevant scales (Kaiser 1984a;
+                          expected for an unbiased distribution by a similar factor.            Barnes et al 1985). The linear correlation function correspond-
+                          Applying a simple model of biased galaxy formation to our             ing to equation (2) is negative for r > 18(Q/i2)“1 Mpc, so that if
+                          Einstein-de Sitter simulations, we find a “ galaxy ” distribution     Abell clusters are indeed positively correlated at r = lOOh-1
+                          which fits the observed two- and three-point correlations and         Mpc (Bahcall and Soneira 1983), then we must conclude that
+                          the observed peculiar velocity distribution quite well. This kind     Qh <0.18. The Bootes void appears incompatible with CDM
+                          of model may therefore reconcile the theoretical imperative of        models in which galaxies are assumed to follow the mass dis-
+                          a flat universe with the low density values implied by observa-       tribution, as well as with the recipe for biased galaxy formation
+                          tions of galaxy motions.                                              which we have considered. It is not clear whether an alternative
+                             The evolution of a universe dominated by cold dark matter          recipe could explain the low density of galaxies in such a large
+                          is difficult to simulate because of the speed with which the          region of space.
+                          characteristic scale of clustering grows. Even with a very large         Further constraints on the CDM model come from observa-
+                          increase in computing resources, it would be possible to follow       tional limits on the anisotropy of the microwave background
+                         clustering at times before the start of our models over expan-         radiation. Recent calculations have shown that the stringent
+                          sion by at most a factor of 2. Nevertheless, models with higher       limit of Uson and Wilkinson (1984) is able to rule out CDM
+                          spatial resolution than those of the present paper are desirable      models with Qh13 < 0.2 at the 95% confidence level unless the
+                          in order to study the formation of galactic halos in greater          universe was reionized at z > 50 (Bond and Efstathiou 1984;
+                          detail. This is clearly a prerequisite for any more detailed          Vittorio and Silk 1984). The energy requirements for reioniza-
+                          theory of galaxy formation, and it would also be useful for a         tion are quite extreme, and if this loophole is discounted, the
+                          more thorough investigation of the consequences of our own            microwave background limits exclude all unbiased models for
+                          very simple prescription. Models with a larger dynamic range          which we find even rough agreement with the observed pecu-
+                          are necessary to study the large-scale morphology of the              liar velocity distribution of galaxies. The microwave limits are,
+                          “galaxy” distribution because small-scale resolution must be          however, very far from constraining the kind of biased forma-
+                          retained to locate the initial density peaks on which “ galaxies ”    tion model we have considered.
+                          form. Until we have made such models, we cannot be sure that              A great virtue of the general theoretical framework investi-
+
+
+
+
+                                    © American Astronomical Society • Provided by the NASA Astrophysics Data System
+1985ApJ. . .292. .371D
+
+
+                         394                                                                      DAVIS ET AL.
+
+                         gated in this article is the fact that it makes very specific predic-                   faithfully by the distribution of CDM, and our crude attempts
+                         tions for the initial conditions from which structure must form.                        to model galaxy formation suggest that Q = 1 might even be
+                         It may therefore be possible to disprove it, in the same way as                         required to get good agreement with observation. This seems
+                         we found the standard neutrino-dominated universe to be                                 too good to be true, but perhaps it hints that we are at last
+                         untenable once its observational consequences were analyzed                             approaching a correct resolution of the missing mass problem.
+                         sufficiently carefully (White, Frenk, and Davis 1983; White,
+                         Davis, and Frenk 1984). Conversely, if the properties of a uni-                            This research has been carried out over a period of more
+                         verse filled with CDM are found to agree with observation, this                         than two years and has benefited greatly from discussions with
+                         must be considered a significant success, since there is very                           many people. We would like to extend particular thanks to all
+                         little freedom to adjust the theoretical predictions. The direct                        participants in the 1984 program of the Evolution of Structure
+                         detection of most of the elementary-particle candidates for                             in the Universe at the Institute for Theoretical Physics. We are
+                         CDM remains a remote possibility, so their cosmological                                 also very grateful to the director and to his staff for their warm
+                         implications may be the strongest indication of their existence.                        hospitality during our stay. Various stages of this work were
+                         The major uncertainty in these implications comes from the                              supported by the UK SERC, by the NSF under grants nos.
+                         fact that while we can predict the distribution of mass, what we                        AST 81-14715, AST 81-18557, PHY 77-27084 (supplemented
+                         see is the distribution of galaxies. As we have shown, the latter                       by funds from the National Aeronautics and Space
+                         may be strongly influenced by the details of galaxy formation,                          Administration), and by Department of Energy contract AT03-
+                         a process which we are unlikely to understand fully in the                              82ER1240069. Considerable amounts of computer time were
+                         foreseeable future. Nevertheless, it is remarkable how many                             provided by the ITP, by the Royal Greenwich Observatory,
+                         aspects of the observed galaxy distribution are reflected quite                         and by the Institute of Astronomy, Cambridge.
+
+                                                                                                        REFERENCES
+                         Bahcall, N. A., and Soneira, R. M. 1983, Ap. J., 270,20.                              Hockney, R. W., and Eastwood, J. W. 1981, Computer Simulations using Par-
+                         Bardeen, J. M. 1984, in Inner Space/Outer Space (Chicago: University of                 ticles (New York : McGraw-Hill).
+                           Chicago Press), in press.                                                           Huchra, J., Davis, M., Latham, D. W., and Tonry, J. 1983, Ap. J. Suppl., 53, 89.
+                         Bardeen, J. M., Steinhardt, P. J., and Turner, M. S. 1983, Phys. Rev. D, 28,679.      Kaiser, N. 1984a, Ap. J. (Letters), 284, L9.
+                         Barnes, J., Dekel, A., Efstathiou, G., and Frenk, C. S. 1985, Ap. J., submitted.              . 1984h, in Inner Space/Outer Space (Chicago: University of Chicago
+                         Bean, A. J., Efstathiou, G., Ellis, R. S., Peterson, B. A., and Shanks, T. 1983,        Press), in press.
+                           M.N.R.A.S., 205, 605.                                                               Kibble, T. W. B. 1976, J. Phys. A, 9,1387.
+                         Bhavsar, S. P., Gott, J. R., and Aarseth, S. J. 1981, Ap. J., 246,65.                 Kirshner, R. P., Oemler, A., Schechter, P. L., and Shectman, S. A. 1981, Ap. J.
+                         Blumenthal, G. R., Faber, S. M., Primack, J. R., and Rees, M. J. 1984, Nature,          (Letters), 248, L57.
+                           311,517.                                                                                    . 1983, in I AU Symposium 104, Early Evolution of the Universe and its
+                         Blumenthal, G. R., and Primack, J. R. 1983, in Fourth Workshop on Grand                 Present Structure, ed. G. O. Abell and G. Chincarini (Dordrecht : Reidel), p.
+                           Unification, ed. H. A. Weldon, P. Langacker, and P. J. Steinhardt (Boston:            197.
+                           Birkhauser), p. 256.                                                                Klypin, A. A., and Shandarin, S. F. 1983, M.N.R.A.S., 204,891.
+                         Bond, J. R., Centrella, J., Szalay, A. S., and Wilson, J. R. 1983, in Formation and   Koo, D., and Szalay, A. S. 1984, Ap. J., 282, 390.
+                           Evolution of Galaxies and Large Structures in the Universe, ed. J. Audouze          Melott, A. L., Einasto, J., Saar, E., Suisalu, L, Klypin, A. A., and Shandarin, S.
+                           and J. Tran Thanh Van (Dordrecht : Reidel), p. 87.                                    F. 1983, Phys. Rev. Letters, 51,935.
+                         Bond, J. R., and Efstathiou, G. 1984, Ap. J. (Letters), 285, L45.                     Oort, J. 1983, Ann. Rev. Astr. Ap., 21, 373.
+                         Bond, J. R., and Szalay, A. S. 1983, Ap. J., 274,443.                                 Pagels, H. R., and Primack, J. R. 1982, Phys. Rev. Letters, 48, 223.
+                         Bond, J. R., Szalay, A. S., and Turner, M. S. 1982, Phys. Rev. Letters, 48,1636.      Peebles, P. J. E. 1974, Ap. J. (Letters), 189, L51.
+                         Centrella, J., and Melott, A. L. 1983, Nature, 305,196.                                    —. 1980, The Large Scale Structure of the Universe (Princeton: Princeton
+                         Davis, M. 1984, in Inner Space/Outer Space (Chicago: University of Chicago              University Press).
+                           Press), in press.                                                                           . 1982, Ap. J., 258,415.
+                         Davis, M., and Huchra, J. 1982, Ap. J., 254,425.                                           —. 1984, Ap. J., 277,470.
+                         Davis, H., Huchra, J., Latham, D. W., and Tonry, J. 1982, Ap. J., 253,423.            Peebles, P. J. E., and Groth, E. J. 1975, Ap. J., 196,1.
+                         Davis, M., and Peebles, P. J. E. 1977, Ap. J. Suppl., 34,425.                         Preskill, J., Wise, M. B., and Wilczek, F. 1983, Phys. Letters, 120B, 127.
+                                 . 1983, Ap. J., 267,465.                                                      Press, W. H. 1980, Phys. Scripta, 21, 702.
+                         Dekel, A., and West, M. J. 1985, Ap. J., 288,411.                                     Sargent, W. L. W., Young, P. J., Boksenberg, A., and Tytler, D. 1980, Ap. J.
+                         Efstathiou, G., and Barnes, J. 1983, in Formation and Evolution of Galaxies and         Suppl., 42,41.
+                           Large Structures in the Universe, ed. J. Audouze and J. Tran Thanh Van              Shanks, T., Bean, A. J., Efstathiou, G., Ellis, R. S., and Peterson, B. A. 1983, Ap.
+                           (Dordrecht : Reidel), p. 361.                                                         J., 274, 529.
+                         Efstathiou, G., Davis, M., Frenk, C. S., and White, S. D. M. 1985, Ap. J. Suppl.,     Shapiro, P. R., Struck-Marcell, C, and Melott, A. L. 1983, Ap. J., 275,473.
+                           57, 241 (EDFW).                                                                     Starobinskii, A. 1982, Phys. Letters, 117B, 175.
+                         Efstathiou, G., and Eastwood, J. W. 1981, M.N.R.A.S., 194, 503.                       Turner, M., and Schramm, D. 1978, Nature, 279, 303.
+                         Efstathiou, G., and Jedredjewski, R. 1985, in preparation.                            Uson, J. M, and Wilkinson, D. T. 1984, Ap. J. (Letters), 277, LI.
+                         Efstathiou, G., Fall, S. M., and Hogan, C. 1979, M.N.R.A.S., 189, 203.                Vittorio, N., and Silk, J. 1984, Ap. J. (Letters), 285, L39.
+                         Einasto, J., Klypin, A. A., Saar, E., and Shandarin, S. F. 1984, M.N.R.A.S., 206,     White, S. D. M, Davis, M., and Frenk, C. S. 1984, M.N.R.A.S., 209. 27P.
+                           529.                                                                                White, S. D. M., Frenk, C. S., and Davis, M. 1983, Ap. J. (Letters), 274, LI.
+                         Fall, S. M. 1979, Rev. Mod. Phys., 51,21.                                             White, S. D. M., and Negroponte, J. 1982, M.N.R.A.S., 201,401.
+                         Frenk, C. S., White, S. D. M., and Davis, M. 1983, Ap. J., 271,417.                   Weinberg, S. 1979, Phys. Rev. Letters, 42, 850.
+                         Fry, J. 1984, Ap. J., 279,499.                                                        Wilson, M. L., and Silk, J. 1981, Ap. J., 243,14.
+                         Groth, E. J., and Peebles, P. J. E. 1977, Ap. J., 217, 385.                           Yang, J., Turner, M. S., Steigman, G., Schramm, D. N., and Olive, K. A. 1984,
+                         Guth, A. 1981, Phys. Rev. D, 23, 347.                                                   Ap. J., 281,493.
+                         Guth, A., and Pi, S.-Y. 1982, Phys. Rev. Letters, 49,1110.                            Zel’dovich, Ya. B. 1970, Astr. Ap., 5, 84.
+                         Harrison, E. R. 1970, Phys. Rev. D, 1,2726.                                           — . 1972, M.N.R.A.S., 160, IP.
+                         Hawking, S. 1982, Phys. Letters, 115B, 295.
+
+                         Marc Davis : Department of Astronomy, University of California, Berkeley, CA 94720
+
+                         George Efstathiou: Institute of Astronomy, Madingley Road, Cambridge CB3 OH A, England
+
+                         Carlos Frenk : Astronomy Centre, Physics Building, University of Sussex, Falmer, Brighton BN1 9QH, England
+
+                         Simon White: Steward Observatory, University of Arizona, Tucson, AZ                            85721
+
+
+
+
+                                       © American Astronomical Society • Provided by the NASA Astrophysics Data System
+
