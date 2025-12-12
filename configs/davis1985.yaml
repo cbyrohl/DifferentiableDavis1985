@@ -28,3 +28,6 @@ mesh_shape: 64
 
 # Random seed
 seed: 1985
+
+# Minimum number of output snapshots for ODE integrator
+n_steps_min: 2

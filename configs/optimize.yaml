@@ -1,0 +1,33 @@
+# Optimization configuration
+# Fast reconstruction for testing gradient-based optimization
+
+# Number of particles per dimension
+# (Not critical for reconstruction speed - mesh_shape is more important)
+n_particles: 16
+
+# Standard LCDM cosmology
+omega_m: 0.3
+
+# Initial scale factor (a=0.01 -> z=99)
+a_init: 0.01
+
+# Final scale factor (a=0.33 -> z~2)
+# Using z=2 instead of z=0 for faster evolution (less non-linear)
+a_final: 0.33
+
+# Box size in comoving Mpc/h
+box_size: 100.0
+
+# Mesh cells per dimension for density field
+# This is THE KEY parameter for optimization speed!
+# mesh_shape^3 determines the size of the density field being optimized
+# 12^3 = 1,728 cells → ~6-8 sec/iteration
+# 16^3 = 4,096 cells → ~15-20 sec/iteration
+mesh_shape: 12
+
+# Random seed
+seed: 42
+
+# Minimum number of output snapshots for ODE integrator
+# Keep at 2 for fastest reconstruction (just initial and final)
+n_steps_min: 2

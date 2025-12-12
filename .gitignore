@@ -12,3 +12,4 @@ wheels/
 # Data files
 *.png
 *.npy
+*.gif

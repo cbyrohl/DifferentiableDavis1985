@@ -17,6 +17,8 @@ class SimulationConfig:
         box_size: float = 100.0,
         mesh_shape: Optional[int] = None,
         seed: int = 42,
+        suffix: Optional[str] = None,
+        n_steps_min: int = 2,
     ):
         self.n_particles = n_particles
         self.omega_m = omega_m
@@ -25,6 +27,8 @@ class SimulationConfig:
         self.box_size = box_size
         self.mesh_shape = mesh_shape if mesh_shape is not None else n_particles // 2
         self.seed = seed
+        self.suffix = suffix
+        self.n_steps_min = n_steps_min
 
     @property
     def z_init(self) -> float:
@@ -57,6 +61,10 @@ class SimulationConfig:
         with open(path, "r") as f:
             config_dict = yaml.safe_load(f)
 
+        # Derive suffix from config filename if not explicitly set
+        if "suffix" not in config_dict or config_dict["suffix"] is None:
+            config_dict["suffix"] = path.stem
+
         return cls(**config_dict)
 
     def to_dict(self) -> dict:
@@ -69,6 +77,8 @@ class SimulationConfig:
             "box_size": self.box_size,
             "mesh_shape": self.mesh_shape,
             "seed": self.seed,
+            "suffix": self.suffix,
+            "n_steps_min": self.n_steps_min,
         }
 
     def __repr__(self) -> str:
@@ -79,5 +89,6 @@ class SimulationConfig:
             f"a_final={self.a_final} (z={self.z_final:.1f}), "
             f"box_size={self.box_size}, "
             f"mesh_shape={self.mesh_shape}, "
-            f"seed={self.seed})"
+            f"seed={self.seed}, "
+            f"n_steps_min={self.n_steps_min})"
         )

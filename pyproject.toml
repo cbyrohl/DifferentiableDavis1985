@@ -8,8 +8,11 @@ authors = [
 ]
 requires-python = ">=3.11"
 dependencies = [
+    "imageio>=2.37.2",
+    "jax-cosmo>=0.1.0",
     "jaxpm>=0.1.6",
     "matplotlib>=3.10.8",
+    "optax>=0.2.0",
     "packaging>=25.0",
     "pyyaml>=6.0.3",
     "setuptools>=80.9.0",
