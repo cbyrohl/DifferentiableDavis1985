@@ -13,7 +13,7 @@ Animation showing density field evolution:
 
 ## Optimization
 
-*Results pending.*
+![Reconstruction Animation](../output/reconstruction/reconstruction_animation.gif)
 
 ## Reconstruction
 
