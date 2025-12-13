@@ -13,6 +13,10 @@ ApJ, 292, 371-394
 
 The paper presented simulations of gravitational clustering in cold dark matter dominated universes with 32,768 particles, demonstrating the formation of large-scale structure, filaments, and voids.
 
+## Final Report
+
+See [final_report/index.md](final_report/index.md) for results and visualizations.
+
 ## Current Status
 
 ✅ **Fig 1 (bottom left) simulation implemented** - EdS1 model at a = 2.4
