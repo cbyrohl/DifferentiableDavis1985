@@ -30,3 +30,7 @@ seed: 1985
 
 # Minimum number of output snapshots for ODE integrator
 n_steps_min: 2
+
+# ODE integrator tolerances
+rtol: 1.0e-5
+atol: 1.0e-5

@@ -11,7 +11,7 @@ from .simulation import run_nbody_simulation
 from .plotting import plot_density_slice_from_cube, plot_density_comparison, plot_overdensity_comparison, plot_reconstruction_comparison_2x2, generate_reconstruction_gif
 from .config import SimulationConfig
 from .forward_model import Davis1985Simulation
-from .optimization import generate_target_and_reconstruct
+from .optimization import generate_target_and_reconstruct, generate_target_and_reconstruct_2d, reconstruct_from_2d_target
 from .extract_mask import extract_particle_mask
 
 
@@ -177,8 +177,8 @@ def reconstruct(
     omega_c: Annotated[float, typer.Option("--omega-c", help="CDM density parameter")] = 0.25,
     sigma8: Annotated[float, typer.Option("--sigma8", help="Matter fluctuation amplitude")] = 0.8,
     target_seed: Annotated[int, typer.Option("--target-seed", help="Seed for generating target")] = 42,
-    reconstruction_seed: Annotated[int, typer.Option("--recon-seed", help="Seed for reconstruction init")] = 1234,
-    n_iterations: Annotated[int, typer.Option("--iterations", "-i", help="Number of optimization iterations")] = 100,
+    reconstruction_seed: Annotated[int, typer.Option("--recon-seed", help="Seed for reconstruction init")] = 1234325,
+    n_iterations: Annotated[Optional[int], typer.Option("--iterations", "-i", help="Number of optimization iterations (overrides config)")] = None,
     learning_rate: Annotated[float, typer.Option("--lr", help="Learning rate for Adam optimizer")] = 1e-1,
     loss_type: Annotated[str, typer.Option("--loss-type", help="Loss function (chi2 or chi2_log)")] = "chi2",
     rtol: Annotated[float, typer.Option("--rtol", help="ODE relative tolerance (lower=faster, default 1e-4)")] = 1e-4,
@@ -188,6 +188,8 @@ def reconstruct(
     generate_gif: Annotated[bool, typer.Option("--gif/--no-gif", help="Generate GIF animation of optimization iterations")] = True,
     gif_save_every: Annotated[int, typer.Option("--gif-save-every", help="Save every N iterations for GIF (lower=more frames)")] = 5,
     gif_fps: Annotated[int, typer.Option("--gif-fps", help="Frames per second for GIF")] = 2,
+    noise_init: Annotated[bool, typer.Option("--noise-init/--no-noise-init", help="Use pure Gaussian noise for initialization instead of cosmological ICs")] = False,
+    noise_sigma: Annotated[float, typer.Option("--noise-sigma", help="Standard deviation for Gaussian noise initialization")] = 0.001,
     verbose: Annotated[bool, typer.Option("--verbose", "-v", help="Enable verbose (DEBUG) logging")] = True,
 ):
     """Reconstruct initial conditions from target final density field.
@@ -246,7 +248,6 @@ def reconstruct(
     logger.info(f"  n_steps_min: {n_steps_min}")
     logger.info(f"  Omega_c: {omega_c}, sigma8: {sigma8}")
     logger.info("Reconstruction parameters:")
-    logger.info(f"  Iterations: {n_iterations}")
     logger.info(f"  Learning rate: {learning_rate}")
     logger.info(f"  Loss type: {loss_type}")
 
@@ -258,19 +259,34 @@ def reconstruct(
         sigma8=sigma8,
     )
 
+    # Get reconstruction parameters from config or use CLI defaults
+    recon_seed = getattr(sim_config, 'reconstruction_seed', reconstruction_seed)
+    init_scale = getattr(sim_config, 'reconstruction_init_scale', 0.1)
+    iters = n_iterations if n_iterations is not None else getattr(sim_config, 'n_iterations', 100)
+
+    logger.info(f"  Reconstruction seed: {recon_seed}")
+    logger.info(f"  Iterations: {iters}")
+    if noise_init:
+        logger.info(f"  Init: Gaussian noise (sigma={noise_sigma})")
+    else:
+        logger.info(f"  Init: Cosmological ICs (scale={init_scale})")
+
     # Run reconstruction
     logger.info("Starting reconstruction...")
     results = generate_target_and_reconstruct(
         model=model,
         target_seed=target_seed,
-        reconstruction_seed=reconstruction_seed,
-        n_iterations=n_iterations,
+        reconstruction_seed=recon_seed,
+        n_iterations=iters,
         learning_rate=learning_rate,
         loss_type=loss_type,
         rtol=rtol,
         atol=atol,
         save_iterations=generate_gif,
-        save_every=gif_save_every
+        save_every=gif_save_every,
+        init_scale=init_scale,
+        noise_init=noise_init,
+        noise_sigma=noise_sigma
     )
 
     # Create output directory
@@ -347,6 +363,596 @@ def reconstruct(
     logger.info(f"Results saved to: {output_path}/")
 
 
+
+@app.command("reconstruct-2d")
+def reconstruct_2d(
+    config: Annotated[Optional[str], typer.Option("--config", "-c", help="Path to YAML config file")] = None,
+    mesh_shape: Annotated[Optional[int], typer.Option("--mesh", "-m", help="Mesh cells per dimension (overrides config)")] = None,
+    box_size: Annotated[Optional[float], typer.Option("--box-size", "-L", help="Box size in Mpc/h (overrides config)")] = None,
+    z_init: Annotated[Optional[float], typer.Option("--z-init", help="Initial redshift (overrides config)")] = None,
+    z_final: Annotated[Optional[float], typer.Option("--z-final", help="Final redshift (overrides config)")] = None,
+    omega_c: Annotated[float, typer.Option("--omega-c", help="CDM density parameter")] = 0.25,
+    sigma8: Annotated[float, typer.Option("--sigma8", help="Matter fluctuation amplitude")] = 0.8,
+    target_seed: Annotated[int, typer.Option("--target-seed", help="Seed for generating target")] = 42,
+    reconstruction_seed: Annotated[int, typer.Option("--recon-seed", help="Seed for reconstruction init")] = 1234,
+    n_iterations: Annotated[int, typer.Option("--iterations", "-i", help="Number of optimization iterations")] = 100,
+    learning_rate: Annotated[float, typer.Option("--lr", help="Learning rate for Adam optimizer")] = 1e-1,
+    loss_type: Annotated[str, typer.Option("--loss-type", help="Loss function (chi2 or chi2_log)")] = "chi2",
+    projection_axis: Annotated[int, typer.Option("--axis", help="Projection axis (0=x, 1=y, 2=z)")] = 2,
+    rtol: Annotated[float, typer.Option("--rtol", help="ODE relative tolerance (lower=faster, default 1e-4)")] = 1e-4,
+    atol: Annotated[float, typer.Option("--atol", help="ODE absolute tolerance (lower=faster, default 1e-4)")] = 1e-4,
+    n_steps_min: Annotated[Optional[int], typer.Option("--n-steps-min", help="Min output snapshots for ODE integrator (overrides config)")] = None,
+    output_dir: Annotated[str, typer.Option("--output", "-o", help="Output directory")] = "output/reconstruction_2d",
+    generate_gif: Annotated[bool, typer.Option("--gif/--no-gif", help="Generate GIF animation of optimization iterations")] = True,
+    gif_save_every: Annotated[int, typer.Option("--gif-save-every", help="Save every N iterations for GIF (lower=more frames)")] = 5,
+    gif_fps: Annotated[int, typer.Option("--gif-fps", help="Frames per second for GIF")] = 2,
+    verbose: Annotated[bool, typer.Option("--verbose", "-v", help="Enable verbose (DEBUG) logging")] = True,
+):
+    """Reconstruct initial conditions from target 2D projection.
+
+    This command demonstrates the differentiable capabilities by:
+    1. Generating target ICs and running forward simulation
+    2. Projecting to 2D to create a target projection
+    3. Reconstructing ICs by optimizing the 2D projection match (chi2)
+    4. Comparing target vs reconstructed fields and projections
+    """
+    import matplotlib.pyplot as plt
+    import jax.numpy as jnp
+    import numpy as np
+
+    configure_logging(verbose=verbose)
+
+    logger.info("=" * 70)
+    logger.info("2D PROJECTION RECONSTRUCTION")
+    logger.info("=" * 70)
+
+    # Load config from file or use defaults
+    if config is not None:
+        sim_config = SimulationConfig.from_yaml(config)
+        logger.info(f"Loaded config from: {config}")
+    else:
+        sim_config = SimulationConfig()
+        logger.info("Using default configuration")
+
+    # Override with command-line arguments
+    if mesh_shape is not None:
+        sim_config.mesh_shape = mesh_shape
+    if box_size is not None:
+        sim_config.box_size = box_size
+    if z_init is not None:
+        sim_config.a_init = 1.0 / (1.0 + z_init)
+    if z_final is not None:
+        sim_config.a_final = 1.0 / (1.0 + z_final)
+
+    # Auto-calculate mesh_shape if still None and no config
+    if sim_config.mesh_shape is None and config is None:
+        sim_config.mesh_shape = 16  # Default for reconstruction
+
+    # Determine n_steps_min
+    if n_steps_min is None:
+        n_steps_min = getattr(sim_config, 'n_steps_min', 2)
+
+    # Set up model
+    mesh_shape_tuple = (sim_config.mesh_shape, sim_config.mesh_shape, sim_config.mesh_shape)
+    a_init = sim_config.a_init
+    a_final = sim_config.a_final
+    snapshots = jnp.linspace(a_init, a_final, n_steps_min)
+
+    logger.info("Simulation parameters:")
+    logger.info(f"  Mesh: {sim_config.mesh_shape}^3 = {sim_config.mesh_shape**3} cells")
+    logger.info(f"  Box size: {sim_config.box_size} Mpc/h")
+    logger.info(f"  Redshift: {sim_config.z_init:.1f} -> {sim_config.z_final:.1f} (a: {a_init:.4f} -> {a_final:.4f})")
+    logger.info(f"  n_steps_min: {n_steps_min}")
+    logger.info(f"  Omega_c: {omega_c}, sigma8: {sigma8}")
+    logger.info("2D Reconstruction parameters:")
+    logger.info(f"  Iterations: {n_iterations}")
+    logger.info(f"  Learning rate: {learning_rate}")
+    logger.info(f"  Loss type: {loss_type}")
+    logger.info(f"  Projection axis: {projection_axis} ({'xyz'[projection_axis]}-axis)")
+
+    model = Davis1985Simulation(
+        mesh_shape=mesh_shape_tuple,
+        box_size=sim_config.box_size,
+        snapshots=snapshots,
+        omega_c=omega_c,
+        sigma8=sigma8,
+    )
+
+    # Get reconstruction parameters from config or use CLI defaults
+    recon_seed = getattr(sim_config, 'reconstruction_seed', reconstruction_seed)
+    init_scale = getattr(sim_config, 'reconstruction_init_scale', 0.1)
+
+    logger.info(f"  Reconstruction seed: {recon_seed}")
+    logger.info(f"  Initial scale factor: {init_scale}")
+
+    # Run 2D reconstruction
+    logger.info("Starting 2D reconstruction...")
+    results = generate_target_and_reconstruct_2d(
+        model=model,
+        target_seed=target_seed,
+        reconstruction_seed=recon_seed,
+        n_iterations=n_iterations,
+        learning_rate=learning_rate,
+        loss_type=loss_type,
+        projection_axis=projection_axis,
+        rtol=rtol,
+        atol=atol,
+        save_iterations=generate_gif,
+        save_every=gif_save_every,
+        init_scale=init_scale
+    )
+
+    # Create output directory
+    output_path = Path(output_dir)
+    output_path.mkdir(exist_ok=True, parents=True)
+    logger.debug(f"Output directory: {output_path}")
+
+    # Save results
+    logger.info("Saving results...")
+    np.save(output_path / "target_ics.npy", np.array(results['target_ics']))
+    np.save(output_path / "target_density_init.npy", np.array(results['target_density_init']))
+    np.save(output_path / "target_density_final.npy", np.array(results['target_density_final']))
+    np.save(output_path / "target_projection.npy", np.array(results['target_projection']))
+    np.save(output_path / "reconstructed_ics.npy", np.array(results['reconstructed_ics']))
+    np.save(output_path / "reconstructed_density_init.npy", np.array(results['reconstructed_density_init']))
+    np.save(output_path / "reconstructed_density_final.npy", np.array(results['reconstructed_density_final']))
+    np.save(output_path / "reconstructed_projection.npy", np.array(results['reconstructed_projection']))
+    np.save(output_path / "losses.npy", np.array(results['losses']))
+    logger.debug(f"Saved arrays to {output_path}/")
+
+    # Plot loss convergence
+    logger.info("Plotting loss convergence...")
+    fig, ax = plt.subplots(figsize=(8, 6))
+    ax.plot(results['losses'], marker='o')
+    ax.set_xlabel("Iteration (x10)")
+    ax.set_ylabel("Loss")
+    ax.set_yscale('log')
+    ax.set_title(f"2D Reconstruction Loss Convergence ({loss_type})")
+    ax.grid(True, alpha=0.3, which='both')
+    loss_path = output_path / "loss_convergence.png"
+    fig.savefig(loss_path, dpi=150, bbox_inches='tight')
+    logger.debug(f"Saved to: {loss_path}")
+    plt.close(fig)
+
+    # Plot 2x2 comparison: Target vs Reconstructed 2D projections
+    logger.info("Plotting 2D projection comparison...")
+    fig, axes = plt.subplots(2, 2, figsize=(12, 12))
+
+    # Target projection
+    ax = axes[0, 0]
+    im = ax.imshow(results['target_projection'], cmap='viridis', interpolation='nearest', origin='lower')
+    ax.set_title("Target 2D Projection")
+    ax.set_xlabel("Pixel")
+    ax.set_ylabel("Pixel")
+    plt.colorbar(im, ax=ax, fraction=0.046, pad=0.04)
+
+    # Reconstructed projection
+    ax = axes[0, 1]
+    im = ax.imshow(results['reconstructed_projection'], cmap='viridis', interpolation='nearest', origin='lower')
+    ax.set_title("Reconstructed 2D Projection")
+    ax.set_xlabel("Pixel")
+    ax.set_ylabel("Pixel")
+    plt.colorbar(im, ax=ax, fraction=0.046, pad=0.04)
+
+    # Difference
+    ax = axes[1, 0]
+    diff = np.array(results['reconstructed_projection']) - np.array(results['target_projection'])
+    vmax = np.percentile(np.abs(diff), 99)
+    if vmax == 0:
+        vmax = 1.0
+    im = ax.imshow(diff, cmap='RdBu_r', interpolation='nearest', origin='lower', vmin=-vmax, vmax=vmax)
+    ax.set_title("Difference (Reconstructed - Target)")
+    ax.set_xlabel("Pixel")
+    ax.set_ylabel("Pixel")
+    plt.colorbar(im, ax=ax, fraction=0.046, pad=0.04)
+
+    # 3D density slice comparison (final)
+    from .plotting import density_to_overdensity
+    ax = axes[1, 1]
+    slc_idx = results['target_density_final'].shape[projection_axis] // 2
+    if projection_axis == 0:
+        target_slice = density_to_overdensity(results['target_density_final'])[slc_idx, :, :]
+        recon_slice = density_to_overdensity(results['reconstructed_density_final'])[slc_idx, :, :]
+    elif projection_axis == 1:
+        target_slice = density_to_overdensity(results['target_density_final'])[:, slc_idx, :]
+        recon_slice = density_to_overdensity(results['reconstructed_density_final'])[:, slc_idx, :]
+    else:
+        target_slice = density_to_overdensity(results['target_density_final'])[:, :, slc_idx]
+        recon_slice = density_to_overdensity(results['reconstructed_density_final'])[:, :, slc_idx]
+
+    # Show target on left, recon on right
+    combined = np.concatenate([np.array(target_slice), np.array(recon_slice)], axis=1)
+    vmax = np.percentile(np.abs(combined), 99)
+    im = ax.imshow(combined.T, cmap='RdBu_r', interpolation='nearest', origin='lower', vmin=-vmax, vmax=vmax)
+    ax.axvline(x=target_slice.shape[0], color='white', linewidth=2, linestyle='--')
+    ax.set_title(f"3D Overdensity Slice (Target | Reconstructed)")
+    ax.set_xlabel("Pixel")
+    ax.set_ylabel("Pixel")
+    plt.colorbar(im, ax=ax, fraction=0.046, pad=0.04)
+
+    plt.suptitle(f"2D Projection Reconstruction (axis={projection_axis}, loss={loss_type})", fontsize=14, y=0.995)
+    plt.tight_layout()
+    comparison_path = output_path / "reconstruction_comparison_2d.png"
+    fig.savefig(comparison_path, dpi=150, bbox_inches='tight')
+    logger.info(f"Saved comparison plot to: {comparison_path}")
+    plt.close(fig)
+
+    # Plot 2x2 3D density comparison (same as 3D reconstruction for reference)
+    logger.info("Plotting 3D density comparison...")
+    fig, _ = plot_reconstruction_comparison_2x2(
+        results['target_density_init'],
+        results['target_density_final'],
+        results['reconstructed_density_init'],
+        results['reconstructed_density_final'],
+        sim_config.box_size,
+        a_init=a_init,
+        a_final=a_final,
+    )
+    fig.suptitle("3D Density Field (from 2D Reconstruction)", fontsize=16, y=0.995)
+    density_comparison_path = output_path / "density_comparison_2x2.png"
+    fig.savefig(density_comparison_path, dpi=150, bbox_inches='tight')
+    logger.info(f"Saved 3D density comparison to: {density_comparison_path}")
+    plt.close(fig)
+
+    # Generate GIF animation if iterations were saved
+    if generate_gif and results['iterations_ics']:
+        logger.info(f"Generating 2D projection GIF animation from {len(results['iterations_ics'])} saved iterations...")
+        from .projection import project_density_2d
+        import imageio
+        from io import BytesIO
+
+        frames = []
+        for iteration, ics in results['iterations_ics']:
+            # Run forward simulation
+            positions, _ = model.run_simulation(ics, rtol=rtol, atol=atol)
+            density = model.paint_density(positions[-1])
+            projection = project_density_2d(density, axis=projection_axis)
+
+            # Create frame with target, reconstructed, difference, and ICs
+            fig, axes = plt.subplots(1, 4, figsize=(20, 5))
+
+            ax = axes[0]
+            im = ax.imshow(results['target_projection'], cmap='viridis', interpolation='nearest', origin='lower')
+            ax.set_title("Target Projection")
+            ax.axis('off')
+
+            ax = axes[1]
+            im = ax.imshow(projection, cmap='viridis', interpolation='nearest', origin='lower')
+            ax.set_title(f"Reconstructed (iter {iteration})")
+            ax.axis('off')
+
+            ax = axes[2]
+            diff = np.array(projection) - np.array(results['target_projection'])
+            vmax = np.percentile(np.abs(np.array(results['target_projection'])), 99) * 0.5
+            if vmax == 0:
+                vmax = 1.0
+            im = ax.imshow(diff, cmap='RdBu_r', interpolation='nearest', origin='lower', vmin=-vmax, vmax=vmax)
+            ax.set_title("Difference")
+            ax.axis('off')
+
+            # Show ICs projection (sum along projection axis, same as density)
+            ax = axes[3]
+            ics_arr = np.array(ics)
+            ics_projection = np.sum(ics_arr, axis=projection_axis)
+            ics_vmax = np.percentile(np.abs(ics_projection), 99)
+            if ics_vmax == 0:
+                ics_vmax = 1.0
+            im = ax.imshow(ics_projection.T, cmap='RdBu_r', interpolation='nearest', origin='lower', vmin=-ics_vmax, vmax=ics_vmax)
+            ax.set_title("ICs Projection")
+            ax.axis('off')
+
+            plt.suptitle(f"2D Reconstruction Progress - Iteration {iteration}", fontsize=14)
+            plt.tight_layout()
+
+            buf = BytesIO()
+            fig.savefig(buf, format='png', dpi=100)
+            buf.seek(0)
+            frames.append(imageio.imread(buf))
+            plt.close(fig)
+
+        gif_path = output_path / "reconstruction_animation_2d.gif"
+        imageio.mimsave(gif_path, frames, fps=gif_fps, loop=0)
+        logger.info(f"Saved GIF animation to: {gif_path}")
+
+    # Print final statistics
+    logger.info("=" * 70)
+    logger.info("2D RECONSTRUCTION COMPLETE")
+    logger.info("=" * 70)
+    logger.info(f"Final loss: {results['losses'][-1]:.6e}")
+    logger.info(f"Results saved to: {output_path}/")
+
+
+
+@app.command("reconstruct-2d-from-file")
+def reconstruct_2d_from_file(
+    target_file: Annotated[str, typer.Argument(help="Path to target 2D array (numpy .npy file)")],
+    config: Annotated[Optional[str], typer.Option("--config", "-c", help="Path to YAML config file")] = None,
+    mesh_shape: Annotated[Optional[int], typer.Option("--mesh", "-m", help="Mesh cells per dimension (auto-detected from target if not specified)")] = None,
+    box_size: Annotated[Optional[float], typer.Option("--box-size", "-L", help="Box size in Mpc/h (overrides config)")] = None,
+    z_init: Annotated[Optional[float], typer.Option("--z-init", help="Initial redshift (overrides config)")] = None,
+    z_final: Annotated[Optional[float], typer.Option("--z-final", help="Final redshift (overrides config)")] = None,
+    omega_c: Annotated[float, typer.Option("--omega-c", help="CDM density parameter")] = 0.25,
+    sigma8: Annotated[float, typer.Option("--sigma8", help="Matter fluctuation amplitude")] = 0.8,
+    reconstruction_seed: Annotated[int, typer.Option("--recon-seed", help="Seed for reconstruction init")] = 1234,
+    n_iterations: Annotated[int, typer.Option("--iterations", "-i", help="Number of optimization iterations")] = 100,
+    learning_rate: Annotated[float, typer.Option("--lr", help="Learning rate for Adam optimizer")] = 1e-1,
+    loss_type: Annotated[str, typer.Option("--loss-type", help="Loss function (chi2 or chi2_log)")] = "chi2",
+    projection_axis: Annotated[int, typer.Option("--axis", help="Projection axis (0=x, 1=y, 2=z)")] = 2,
+    is_overdensity: Annotated[bool, typer.Option("--overdensity/--density", help="Input is overdensity (delta) vs raw density")] = True,
+    rtol: Annotated[float, typer.Option("--rtol", help="ODE relative tolerance (lower=faster, default 1e-4)")] = 1e-4,
+    atol: Annotated[float, typer.Option("--atol", help="ODE absolute tolerance (lower=faster, default 1e-4)")] = 1e-4,
+    n_steps_min: Annotated[Optional[int], typer.Option("--n-steps-min", help="Min output snapshots for ODE integrator (overrides config)")] = None,
+    output_dir: Annotated[str, typer.Option("--output", "-o", help="Output directory")] = "output/reconstruction_2d_from_file",
+    generate_gif: Annotated[bool, typer.Option("--gif/--no-gif", help="Generate GIF animation of optimization iterations")] = True,
+    gif_save_every: Annotated[int, typer.Option("--gif-save-every", help="Save every N iterations for GIF (lower=more frames)")] = 5,
+    gif_fps: Annotated[int, typer.Option("--gif-fps", help="Frames per second for GIF")] = 2,
+    verbose: Annotated[bool, typer.Option("--verbose", "-v", help="Enable verbose (DEBUG) logging")] = True,
+):
+    """Reconstruct initial conditions from an external 2D target file.
+
+    Takes a 2D numpy array (e.g., extracted from an image) and reconstructs
+    the 3D initial conditions that would produce a matching 2D projection.
+
+    If the input is overdensity (--overdensity flag, default), it is converted
+    to projected density format for comparison.
+    """
+    import matplotlib.pyplot as plt
+    import jax.numpy as jnp
+    import numpy as np
+
+    configure_logging(verbose=verbose)
+
+    logger.info("=" * 70)
+    logger.info("2D RECONSTRUCTION FROM EXTERNAL TARGET")
+    logger.info("=" * 70)
+
+    # Load target
+    logger.info(f"Loading target from: {target_file}")
+    target_2d = np.load(target_file)
+    logger.info(f"Target shape: {target_2d.shape}")
+    logger.info(f"Target stats: min={target_2d.min():.4f}, max={target_2d.max():.4f}, mean={target_2d.mean():.4f}")
+
+    # Auto-detect mesh shape from target if not specified
+    if mesh_shape is None:
+        if target_2d.shape[0] == target_2d.shape[1]:
+            mesh_shape = target_2d.shape[0]
+            logger.info(f"Auto-detected mesh_shape from target: {mesh_shape}")
+        else:
+            raise ValueError(f"Target must be square for auto mesh detection. Got {target_2d.shape}")
+
+    # Load config from file or use defaults
+    if config is not None:
+        sim_config = SimulationConfig.from_yaml(config)
+        logger.info(f"Loaded config from: {config}")
+    else:
+        sim_config = SimulationConfig()
+        logger.info("Using default configuration")
+
+    # Override with command-line arguments
+    sim_config.mesh_shape = mesh_shape
+    if box_size is not None:
+        sim_config.box_size = box_size
+    if z_init is not None:
+        sim_config.a_init = 1.0 / (1.0 + z_init)
+    if z_final is not None:
+        sim_config.a_final = 1.0 / (1.0 + z_final)
+
+    # Determine n_steps_min
+    if n_steps_min is None:
+        n_steps_min = getattr(sim_config, 'n_steps_min', 2)
+
+    # Convert overdensity to projected density if needed
+    if is_overdensity:
+        logger.info("Converting overdensity to projected density format...")
+        target_projection = (target_2d + 1.0) * mesh_shape
+        logger.info(f"Projected density: min={target_projection.min():.4f}, max={target_projection.max():.4f}, mean={target_projection.mean():.4f}")
+    else:
+        target_projection = target_2d
+
+    # Set up model
+    mesh_shape_tuple = (mesh_shape, mesh_shape, mesh_shape)
+    a_init = sim_config.a_init
+    a_final = sim_config.a_final
+    snapshots = jnp.linspace(a_init, a_final, n_steps_min)
+
+    logger.info("Simulation parameters:")
+    logger.info(f"  Mesh: {mesh_shape}^3 = {mesh_shape**3} cells")
+    logger.info(f"  Box size: {sim_config.box_size} Mpc/h")
+    logger.info(f"  Redshift: {sim_config.z_init:.1f} -> {sim_config.z_final:.1f} (a: {a_init:.4f} -> {a_final:.4f})")
+    logger.info(f"  n_steps_min: {n_steps_min}")
+    logger.info(f"  Omega_c: {omega_c}, sigma8: {sigma8}")
+    logger.info("2D Reconstruction parameters:")
+    logger.info(f"  Iterations: {n_iterations}")
+    logger.info(f"  Learning rate: {learning_rate}")
+    logger.info(f"  Loss type: {loss_type}")
+    logger.info(f"  Projection axis: {projection_axis} ({'xyz'[projection_axis]}-axis)")
+
+    model = Davis1985Simulation(
+        mesh_shape=mesh_shape_tuple,
+        box_size=sim_config.box_size,
+        snapshots=snapshots,
+        omega_c=omega_c,
+        sigma8=sigma8,
+    )
+
+    # Get reconstruction parameters from config or use CLI defaults
+    recon_seed = getattr(sim_config, 'reconstruction_seed', reconstruction_seed)
+    init_scale = getattr(sim_config, 'reconstruction_init_scale', 0.1)
+
+    logger.info(f"  Reconstruction seed: {recon_seed}")
+    logger.info(f"  Initial scale factor: {init_scale}")
+
+    # Run 2D reconstruction
+    logger.info("Starting 2D reconstruction from external target...")
+    results = reconstruct_from_2d_target(
+        target_projection=jnp.array(target_projection),
+        model=model,
+        reconstruction_seed=recon_seed,
+        n_iterations=n_iterations,
+        learning_rate=learning_rate,
+        loss_type=loss_type,
+        projection_axis=projection_axis,
+        rtol=rtol,
+        atol=atol,
+        save_iterations=generate_gif,
+        save_every=gif_save_every,
+        init_scale=init_scale
+    )
+
+    # Create output directory
+    output_path = Path(output_dir)
+    output_path.mkdir(exist_ok=True, parents=True)
+    logger.debug(f"Output directory: {output_path}")
+
+    # Save results
+    logger.info("Saving results...")
+    np.save(output_path / "target_projection.npy", np.array(results['target_projection']))
+    np.save(output_path / "reconstructed_ics.npy", np.array(results['reconstructed_ics']))
+    np.save(output_path / "reconstructed_density_init.npy", np.array(results['reconstructed_density_init']))
+    np.save(output_path / "reconstructed_density_final.npy", np.array(results['reconstructed_density_final']))
+    np.save(output_path / "reconstructed_projection.npy", np.array(results['reconstructed_projection']))
+    np.save(output_path / "losses.npy", np.array(results['losses']))
+    logger.debug(f"Saved arrays to {output_path}/")
+
+    # Plot loss convergence
+    logger.info("Plotting loss convergence...")
+    fig, ax = plt.subplots(figsize=(8, 6))
+    ax.plot(results['losses'], marker='o')
+    ax.set_xlabel("Iteration (x10)")
+    ax.set_ylabel("Loss")
+    ax.set_yscale('log')
+    ax.set_title(f"2D Reconstruction Loss Convergence ({loss_type})")
+    ax.grid(True, alpha=0.3, which='both')
+    loss_path = output_path / "loss_convergence.png"
+    fig.savefig(loss_path, dpi=150, bbox_inches='tight')
+    logger.debug(f"Saved to: {loss_path}")
+    plt.close(fig)
+
+    # Plot 2x2 comparison: Target vs Reconstructed 2D projections
+    logger.info("Plotting 2D projection comparison...")
+    fig, axes = plt.subplots(2, 2, figsize=(12, 12))
+
+    # Target projection
+    ax = axes[0, 0]
+    im = ax.imshow(results['target_projection'], cmap='viridis', interpolation='nearest', origin='lower')
+    ax.set_title("Target 2D Projection")
+    ax.set_xlabel("Pixel")
+    ax.set_ylabel("Pixel")
+    plt.colorbar(im, ax=ax, fraction=0.046, pad=0.04)
+
+    # Reconstructed projection
+    ax = axes[0, 1]
+    im = ax.imshow(results['reconstructed_projection'], cmap='viridis', interpolation='nearest', origin='lower')
+    ax.set_title("Reconstructed 2D Projection")
+    ax.set_xlabel("Pixel")
+    ax.set_ylabel("Pixel")
+    plt.colorbar(im, ax=ax, fraction=0.046, pad=0.04)
+
+    # Difference
+    ax = axes[1, 0]
+    diff = np.array(results['reconstructed_projection']) - np.array(results['target_projection'])
+    vmax = np.percentile(np.abs(diff), 99)
+    if vmax == 0:
+        vmax = 1.0
+    im = ax.imshow(diff, cmap='RdBu_r', interpolation='nearest', origin='lower', vmin=-vmax, vmax=vmax)
+    ax.set_title("Difference (Reconstructed - Target)")
+    ax.set_xlabel("Pixel")
+    ax.set_ylabel("Pixel")
+    plt.colorbar(im, ax=ax, fraction=0.046, pad=0.04)
+
+    # 3D density slice comparison (final)
+    from .plotting import density_to_overdensity
+    ax = axes[1, 1]
+    recon_overdensity = density_to_overdensity(results['reconstructed_density_final'])
+    slc_idx = recon_overdensity.shape[projection_axis] // 2
+    if projection_axis == 0:
+        recon_slice = recon_overdensity[slc_idx, :, :]
+    elif projection_axis == 1:
+        recon_slice = recon_overdensity[:, slc_idx, :]
+    else:
+        recon_slice = recon_overdensity[:, :, slc_idx]
+
+    vmax = np.percentile(np.abs(recon_slice), 99)
+    im = ax.imshow(recon_slice.T, cmap='RdBu_r', interpolation='nearest', origin='lower', vmin=-vmax, vmax=vmax)
+    ax.set_title(f"Reconstructed 3D Overdensity Slice (z={slc_idx})")
+    ax.set_xlabel("Pixel")
+    ax.set_ylabel("Pixel")
+    plt.colorbar(im, ax=ax, fraction=0.046, pad=0.04)
+
+    plt.suptitle(f"2D Reconstruction from External Target (axis={projection_axis}, loss={loss_type})", fontsize=14, y=0.995)
+    plt.tight_layout()
+    comparison_path = output_path / "reconstruction_comparison_2d.png"
+    fig.savefig(comparison_path, dpi=150, bbox_inches='tight')
+    logger.info(f"Saved comparison plot to: {comparison_path}")
+    plt.close(fig)
+
+    # Generate GIF animation if iterations were saved
+    if generate_gif and results['iterations_ics']:
+        logger.info(f"Generating 2D projection GIF animation from {len(results['iterations_ics'])} saved iterations...")
+        from .projection import project_density_2d
+        import imageio
+        from io import BytesIO
+
+        frames = []
+        for iteration, ics in results['iterations_ics']:
+            # Run forward simulation
+            positions, _ = model.run_simulation(ics, rtol=rtol, atol=atol)
+            density = model.paint_density(positions[-1])
+            projection = project_density_2d(density, axis=projection_axis)
+
+            # Create frame with target, reconstructed, difference, and ICs
+            fig, axes = plt.subplots(1, 4, figsize=(20, 5))
+
+            ax = axes[0]
+            im = ax.imshow(results['target_projection'], cmap='viridis', interpolation='nearest', origin='lower')
+            ax.set_title("Target Projection")
+            ax.axis('off')
+
+            ax = axes[1]
+            im = ax.imshow(projection, cmap='viridis', interpolation='nearest', origin='lower')
+            ax.set_title(f"Reconstructed (iter {iteration})")
+            ax.axis('off')
+
+            ax = axes[2]
+            diff = np.array(projection) - np.array(results['target_projection'])
+            vmax = np.percentile(np.abs(np.array(results['target_projection'])), 99) * 0.5
+            if vmax == 0:
+                vmax = 1.0
+            im = ax.imshow(diff, cmap='RdBu_r', interpolation='nearest', origin='lower', vmin=-vmax, vmax=vmax)
+            ax.set_title("Difference")
+            ax.axis('off')
+
+            # Show ICs projection (sum along projection axis, same as density)
+            ax = axes[3]
+            ics_arr = np.array(ics)
+            ics_projection = np.sum(ics_arr, axis=projection_axis)
+            ics_vmax = np.percentile(np.abs(ics_projection), 99)
+            if ics_vmax == 0:
+                ics_vmax = 1.0
+            im = ax.imshow(ics_projection.T, cmap='RdBu_r', interpolation='nearest', origin='lower', vmin=-ics_vmax, vmax=ics_vmax)
+            ax.set_title("ICs Projection")
+            ax.axis('off')
+
+            plt.suptitle(f"2D Reconstruction Progress - Iteration {iteration}", fontsize=14)
+            plt.tight_layout()
+
+            buf = BytesIO()
+            fig.savefig(buf, format='png', dpi=100)
+            buf.seek(0)
+            frames.append(imageio.imread(buf))
+            plt.close(fig)
+
+        gif_path = output_path / "reconstruction_animation_2d.gif"
+        imageio.mimsave(gif_path, frames, fps=gif_fps, loop=0)
+        logger.info(f"Saved GIF animation to: {gif_path}")
+
+    # Print final statistics
+    logger.info("=" * 70)
+    logger.info("2D RECONSTRUCTION FROM FILE COMPLETE")
+    logger.info("=" * 70)
+    logger.info(f"Final loss: {results['losses'][-1]:.6e}")
+    logger.info(f"Results saved to: {output_path}/")
+
 @app.command("demonstration-plots")
 def demonstration_plots(
     config: Annotated[str, typer.Option("--config", "-c", help="Path to YAML config file")] = "configs/validation.yaml",
@@ -410,6 +1016,8 @@ def demonstration_plots(
         omega_m=sim_config.omega_m,
         seed=sim_config.seed,
         n_steps_min=n_snapshots,
+        rtol=sim_config.rtol,
+        atol=sim_config.atol,
     )
 
     logger.info(f"Simulation complete! Generated {len(results['densities'])} snapshots")

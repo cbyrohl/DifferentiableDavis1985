@@ -16,6 +16,9 @@ The project provides a `davis1985` CLI tool built with Typer.
 Available commands:
 - `uv run davis1985 info` - Show project information
 - `uv run davis1985 plot` - Run simulation and generate density field plots
+- `uv run davis1985 reconstruct` - Reconstruct initial conditions from target 3D density field (chi2 optimization)
+- `uv run davis1985 reconstruct-2d` - Reconstruct initial conditions from target 2D projection mask
+- `uv run davis1985 demonstration-plots` - Create demonstration plots showing time evolution
 - `uv run davis1985 extract-mask [image]` - Extract particle mask from scatter plot image (default: paper_material/fig1_lowerleft_original.png)
 
 ## Configuration Files
@@ -27,6 +30,7 @@ Available configs:
 - `configs/validation.yaml` - Simple validation case (64^3 particles, a=0.01→0.33, z=99→2)
 - `configs/davis1985.yaml` - Model EdS1 from Davis et al. (1985) Figure 1 (Einstein-de Sitter, Ω=1)
 - `configs/davis1985_open.yaml` - Model O1 from Davis et al. (1985) Figure 1 (Open universe, Ω evolves)
+- `configs/optimize.yaml` - Fast reconstruction config (12^3 mesh, relaxed tolerances rtol/atol=1e-2)
 
 Usage:
 ```bash
@@ -48,6 +52,9 @@ Config parameters:
 - `box_size`: Box size in comoving Mpc/h
 - `mesh_shape`: Mesh cells per dimension (null = auto-calculate)
 - `seed`: Random seed for initial conditions
+- `n_steps_min`: Minimum number of output snapshots for ODE integrator (default: 2)
+- `rtol`: ODE integrator relative tolerance (default: 1e-5)
+- `atol`: ODE integrator absolute tolerance (default: 1e-5)
 
 **Specific config examples:**
 - Validation: 64^3 particles, Ω=0.3, L=100 Mpc/h, a=0.01→0.33 (z=99→2), auto mesh

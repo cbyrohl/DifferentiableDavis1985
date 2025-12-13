@@ -620,7 +620,6 @@ def generate_reconstruction_gif(
     str
         Path to generated GIF file
     """
-    import tempfile
     import os
     from pathlib import Path
 
@@ -632,9 +631,13 @@ def generate_reconstruction_gif(
     print(f"\nGenerating GIF with {len(iterations_ics)} frames...")
     print(f"Output: {output_path}")
 
-    # Create temp directory for frames
-    temp_dir = tempfile.mkdtemp()
+    # Create frames subdirectory alongside the GIF
+    output_path_obj = Path(output_path)
+    frames_dir = output_path_obj.parent / "frames"
+    frames_dir.mkdir(exist_ok=True, parents=True)
     frame_paths = []
+
+    print(f"Saving frames to: {frames_dir}")
 
     # Determine slice depth
     if slice_depth is None:
@@ -654,97 +657,91 @@ def generate_reconstruction_gif(
 
     extent = [0, boxsize, 0, boxsize]
 
-    try:
-        for idx, (iteration, ics) in enumerate(iterations_ics):
-            print(f"  Frame {idx+1}/{len(iterations_ics)}: iteration {iteration}", flush=True)
+    for idx, (iteration, ics) in enumerate(iterations_ics):
+        print(f"  Frame {idx+1}/{len(iterations_ics)}: iteration {iteration}", flush=True)
 
-            # Run forward simulation with current ICs
-            positions, _ = model.run_simulation(ics, rtol=rtol, atol=atol)
+        # Run forward simulation with current ICs
+        positions, _ = model.run_simulation(ics, rtol=rtol, atol=atol)
 
-            # Paint densities
-            recon_density_init = model.paint_density(positions[0])
-            recon_density_final = model.paint_density(positions[-1])
+        # Paint densities
+        recon_density_init = model.paint_density(positions[0])
+        recon_density_final = model.paint_density(positions[-1])
 
-            # Convert to overdensity
-            recon_delta_init = density_to_overdensity(recon_density_init)
-            recon_delta_final = density_to_overdensity(recon_density_final)
+        # Convert to overdensity
+        recon_delta_init = density_to_overdensity(recon_density_init)
+        recon_delta_final = density_to_overdensity(recon_density_final)
 
-            # Get slices
-            recon_slc_init = recon_delta_init[:, :, slice_depth]
-            recon_slc_final = recon_delta_final[:, :, slice_depth]
+        # Get slices
+        recon_slc_init = recon_delta_init[:, :, slice_depth]
+        recon_slc_final = recon_delta_final[:, :, slice_depth]
 
-            # Create 2x2 plot
-            fig, axes = plt.subplots(2, 2, figsize=(12, 12))
+        # Create 2x2 plot
+        fig, axes = plt.subplots(2, 2, figsize=(12, 12))
 
-            # Imshow kwargs
-            ikw_init = {'extent': extent, 'origin': 'lower', 'cmap': 'RdBu_r',
-                       'vmin': -vmax_init, 'vmax': vmax_init, 'aspect': 'auto'}
-            ikw_final = {'extent': extent, 'origin': 'lower', 'cmap': 'RdBu_r',
-                        'vmin': -vmax_final, 'vmax': vmax_final, 'aspect': 'auto'}
+        # Imshow kwargs
+        ikw_init = {'extent': extent, 'origin': 'lower', 'cmap': 'RdBu_r',
+                   'vmin': -vmax_init, 'vmax': vmax_init, 'aspect': 'auto'}
+        ikw_final = {'extent': extent, 'origin': 'lower', 'cmap': 'RdBu_r',
+                    'vmin': -vmax_final, 'vmax': vmax_final, 'aspect': 'auto'}
 
-            # Top-left: Target initial (static)
-            im_target_init = axes[0, 0].imshow(target_slc_init.T, **ikw_init)
-            axes[0, 0].set_title(f"Target Initial (a = {a_init:.2f})", fontsize=12)
-            axes[0, 0].set_xlabel("cMpc/h")
-            axes[0, 0].set_ylabel("cMpc/h")
+        # Top-left: Target initial (static)
+        im_target_init = axes[0, 0].imshow(target_slc_init.T, **ikw_init)
+        axes[0, 0].set_title(f"Target Initial (a = {a_init:.2f})", fontsize=12)
+        axes[0, 0].set_xlabel("cMpc/h")
+        axes[0, 0].set_ylabel("cMpc/h")
 
-            # Top-right: Target final (static)
-            im_target_final = axes[0, 1].imshow(target_slc_final.T, **ikw_final)
-            axes[0, 1].set_title(f"Target Final (a = {a_final:.2f})", fontsize=12)
-            axes[0, 1].set_xlabel("cMpc/h")
-            axes[0, 1].set_ylabel("cMpc/h")
+        # Top-right: Target final (static)
+        im_target_final = axes[0, 1].imshow(target_slc_final.T, **ikw_final)
+        axes[0, 1].set_title(f"Target Final (a = {a_final:.2f})", fontsize=12)
+        axes[0, 1].set_xlabel("cMpc/h")
+        axes[0, 1].set_ylabel("cMpc/h")
 
-            # Bottom-left: Reconstructed initial (updating)
-            im_recon_init = axes[1, 0].imshow(recon_slc_init.T, **ikw_init)
-            axes[1, 0].set_title(f"Reconstructed Initial (iter {iteration})", fontsize=12)
-            axes[1, 0].set_xlabel("cMpc/h")
-            axes[1, 0].set_ylabel("cMpc/h")
+        # Bottom-left: Reconstructed initial (updating)
+        im_recon_init = axes[1, 0].imshow(recon_slc_init.T, **ikw_init)
+        axes[1, 0].set_title(f"Reconstructed Initial (iter {iteration})", fontsize=12)
+        axes[1, 0].set_xlabel("cMpc/h")
+        axes[1, 0].set_ylabel("cMpc/h")
 
-            # Bottom-right: Reconstructed final (updating)
-            im_recon_final = axes[1, 1].imshow(recon_slc_final.T, **ikw_final)
-            axes[1, 1].set_title(f"Reconstructed Final (iter {iteration})", fontsize=12)
-            axes[1, 1].set_xlabel("cMpc/h")
-            axes[1, 1].set_ylabel("cMpc/h")
+        # Bottom-right: Reconstructed final (updating)
+        im_recon_final = axes[1, 1].imshow(recon_slc_final.T, **ikw_final)
+        axes[1, 1].set_title(f"Reconstructed Final (iter {iteration})", fontsize=12)
+        axes[1, 1].set_xlabel("cMpc/h")
+        axes[1, 1].set_ylabel("cMpc/h")
 
-            # Add colorbars
-            fig.subplots_adjust(left=0.12, right=0.88)
+        # Add colorbars
+        fig.subplots_adjust(left=0.12, right=0.88)
 
-            # LEFT colorbar for initial densities
-            cbar_ax_init = fig.add_axes([0.02, 0.53, 0.02, 0.35])
-            cbar_init = fig.colorbar(im_target_init, cax=cbar_ax_init)
-            cbar_init.set_label(r"Initial $\delta$ (30× zoom)", fontsize=10)
+        # LEFT colorbar for initial densities
+        cbar_ax_init = fig.add_axes([0.02, 0.53, 0.02, 0.35])
+        cbar_init = fig.colorbar(im_target_init, cax=cbar_ax_init)
+        cbar_init.set_label(r"Initial $\delta$ (30× zoom)", fontsize=10)
 
-            # RIGHT colorbar for final densities
-            cbar_ax_final = fig.add_axes([0.92, 0.53, 0.02, 0.35])
-            cbar_final = fig.colorbar(im_target_final, cax=cbar_ax_final)
-            cbar_final.set_label(r"Final $\delta$", fontsize=10)
+        # RIGHT colorbar for final densities
+        cbar_ax_final = fig.add_axes([0.92, 0.53, 0.02, 0.35])
+        cbar_final = fig.colorbar(im_target_final, cax=cbar_ax_final)
+        cbar_final.set_label(r"Final $\delta$", fontsize=10)
 
-            plt.tight_layout(rect=[0.12, 0, 0.88, 1])
+        plt.tight_layout(rect=[0.12, 0, 0.88, 1])
 
-            # Save frame
-            frame_path = os.path.join(temp_dir, f"frame_{idx:04d}.png")
-            fig.savefig(frame_path, dpi=100, bbox_inches='tight')
-            frame_paths.append(frame_path)
-            plt.close(fig)
+        # Save frame to permanent directory
+        frame_filename = f"frame_{idx:04d}_iter_{iteration:04d}.png"
+        frame_path = frames_dir / frame_filename
+        fig.savefig(frame_path, dpi=100, bbox_inches='tight')
+        frame_paths.append(str(frame_path))
+        plt.close(fig)
 
-        # Create GIF from frames
-        print(f"\nCompiling {len(frame_paths)} frames into GIF...")
-        frames = [Image.open(fp) for fp in frame_paths]
-        frames[0].save(
-            output_path,
-            save_all=True,
-            append_images=frames[1:],
-            duration=int(1000/fps),
-            loop=0
-        )
+    # Create GIF from frames
+    print(f"\nCompiling {len(frame_paths)} frames into GIF...")
+    frames = [Image.open(fp) for fp in frame_paths]
+    frames[0].save(
+        output_path,
+        save_all=True,
+        append_images=frames[1:],
+        duration=int(1000/fps),
+        loop=0
+    )
 
-        print(f"GIF saved to: {output_path}")
-
-    finally:
-        # Clean up temp files
-        for fp in frame_paths:
-            if os.path.exists(fp):
-                os.remove(fp)
-        os.rmdir(temp_dir)
+    print(f"GIF saved to: {output_path}")
+    print(f"Individual frames saved to: {frames_dir}")
 
     return output_path

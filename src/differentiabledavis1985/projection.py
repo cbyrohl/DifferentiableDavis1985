@@ -16,7 +16,7 @@ The main workflow is:
 
 import jax
 import jax.numpy as jnp
-from typing import Tuple, Optional
+from typing import Optional
 
 
 def project_density_2d(
@@ -93,14 +93,16 @@ def density_to_soft_mask(
     threshold: Optional[float] = None,
     sharpness: float = 10.0,
     method: str = "occupancy",
-    scale: float = 1.0
+    scale: float = 1.0,
+    normalize: bool = True
 ) -> jnp.ndarray:
     """
     Convert a 3D density field to a 2D soft mask.
 
     This is the main function for differentiable projection. It:
     1. Projects the 3D density to 2D by summing along an axis
-    2. Applies a soft thresholding function to create a mask-like output
+    2. Optionally normalizes by depth to prevent saturation
+    3. Applies a soft thresholding function to create a mask-like output
 
     Args:
         density_3d: 3D density field of shape (nx, ny, nz)
@@ -109,12 +111,18 @@ def density_to_soft_mask(
         sharpness: Sharpness for sigmoid method
         method: "sigmoid" for threshold-based, "occupancy" for exponential
         scale: Scale factor for occupancy method
+        normalize: If True, normalize projection by depth to prevent saturation
 
     Returns:
         2D soft mask in [0, 1] range
     """
     # Project to 2D
     projection = project_density_2d(density_3d, axis=axis)
+
+    # Normalize by depth to keep values in reasonable range
+    if normalize:
+        depth = density_3d.shape[axis]
+        projection = projection / depth
 
     if method == "sigmoid":
         if threshold is None:

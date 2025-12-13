@@ -1,9 +1,9 @@
-# Optimization configuration
-# Fast reconstruction for testing gradient-based optimization
+# Optimization configuration for 64x64 target
+# Configuration for reconstructing from 64x64 binned overdensity field
 
 # Number of particles per dimension
-# (Not critical for reconstruction speed - mesh_shape is more important)
-n_particles: 16
+# Set equal to mesh_shape for good sampling coverage
+n_particles: 64
 
 # Standard LCDM cosmology
 omega_m: 0.3
@@ -19,11 +19,9 @@ a_final: 0.33
 box_size: 100.0
 
 # Mesh cells per dimension for density field
-# This is THE KEY parameter for optimization speed!
-# mesh_shape^3 determines the size of the density field being optimized
-# 12^3 = 1,728 cells → ~6-8 sec/iteration
-# 16^3 = 4,096 cells → ~15-20 sec/iteration
-mesh_shape: 12
+# Must match the 64x64 target array dimensions
+# 64^3 = 262,144 cells -> expect slower iterations than 12^3 or 16^3
+mesh_shape: 64
 
 # Random seed for target generation
 seed: 42
@@ -33,8 +31,7 @@ seed: 42
 reconstruction_seed: 329876
 
 # Scaling factor for initial random ICs in optimization
-# Lower values (0.05-0.1) help convergence by starting closer to zero
-# Higher values (0.2-0.5) start with more structure
+# Starting at 0.0 (uniform density) for stable convergence
 reconstruction_init_scale: 0.0
 
 # Minimum number of output snapshots for ODE integrator

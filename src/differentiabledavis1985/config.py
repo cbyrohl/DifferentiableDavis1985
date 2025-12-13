@@ -21,6 +21,9 @@ class SimulationConfig:
         n_steps_min: int = 2,
         rtol: float = 1e-5,
         atol: float = 1e-5,
+        reconstruction_seed: int = 1234,
+        reconstruction_init_scale: float = 0.1,
+        n_iterations: int = 100,
     ):
         self.n_particles = n_particles
         self.omega_m = omega_m
@@ -33,6 +36,9 @@ class SimulationConfig:
         self.n_steps_min = n_steps_min
         self.rtol = rtol
         self.atol = atol
+        self.reconstruction_seed = reconstruction_seed
+        self.reconstruction_init_scale = reconstruction_init_scale
+        self.n_iterations = n_iterations
 
     @property
     def z_init(self) -> float:
@@ -85,6 +91,9 @@ class SimulationConfig:
             "n_steps_min": self.n_steps_min,
             "rtol": self.rtol,
             "atol": self.atol,
+            "reconstruction_seed": self.reconstruction_seed,
+            "reconstruction_init_scale": self.reconstruction_init_scale,
+            "n_iterations": self.n_iterations,
         }
 
     def __repr__(self) -> str:
@@ -97,5 +106,8 @@ class SimulationConfig:
             f"mesh_shape={self.mesh_shape}, "
             f"seed={self.seed}, "
             f"n_steps_min={self.n_steps_min}, "
-            f"rtol={self.rtol}, atol={self.atol})"
+            f"rtol={self.rtol}, atol={self.atol}, "
+            f"reconstruction_seed={self.reconstruction_seed}, "
+            f"reconstruction_init_scale={self.reconstruction_init_scale}, "
+            f"n_iterations={self.n_iterations})"
         )
